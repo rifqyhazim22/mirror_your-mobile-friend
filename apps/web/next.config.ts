@@ -22,6 +22,9 @@ const baseConfig: ExtendedNextConfig = {
   images: {
     unoptimized: true
   },
+  experimental: {
+    manualClientBasePath: true
+  },
   typedRoutes: true,
   turbopack: {
     root: __dirname
