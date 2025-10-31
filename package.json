@@ -24,7 +24,10 @@
     "@capacitor/android": "5.7.8",
     "@capacitor/cli": "5.7.8",
     "@capacitor/ios": "5.7.8",
+    "next": "16.0.1",
     "prettier": "^3.3.3",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
     "turbo": "^2.2.3"
   },
   "dependencies": {
