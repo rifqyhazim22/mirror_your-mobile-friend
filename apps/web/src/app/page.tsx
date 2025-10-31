@@ -281,7 +281,7 @@ function HeroSection() {
         </p>
         <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
-            href="/"
+            href="/experience"
             className="inline-flex w-full items-center justify-center rounded-full bg-white/90 px-6 py-3 text-sm font-semibold text-[#5c4bff] transition-transform hover:-translate-y-0.5 hover:bg-white sm:w-auto"
           >
             Mulai curhat di web sekarang 💬

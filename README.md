@@ -5,6 +5,7 @@ Mirror adalah aplikasi teman curhat virtual berbasis AI yang berfokus pada dukun
 ## Status Terbaru
 - Struktur monorepo pnpm + Turborepo dengan workspace `apps/web`, `apps/api`, `services/ai`, dan paket bersama.
 - Landing page Next.js bernuansa liquid-glass + emotikon empatik, siap sebagai PWA (next-pwa).
+- Halaman pengalaman `/experience` menghadirkan onboarding empatik multi-langkah + simulasi chat Mirror.
 - Konfigurasi Capacitor (Android, iOS, Electron) untuk menghasilkan APK dan aplikasi desktop dari bundle Next.
 - Dokumentasi build lintas platform: `docs/install-android.md`, `docs/install-desktop.md`, `docs/install-pwa.md`.
 
@@ -29,11 +30,11 @@ pnpm run build:ios          # build web + sync ke proyek iOS
 
 ## Deploy ke Vercel
 1. Pastikan sudah login Vercel: `npm i -g vercel` lalu `vercel login` (sekali).
-2. Hubungkan repo GitHub ini ke project Vercel dan set **Root Directory** = `.` (atau langsung import via Vercel UI).
+2. Hubungkan repo GitHub ini ke project Vercel dan set **Root Directory** = `apps/web`.
 3. Konfigurasi yang dipakai Vercel:
    - Install Command: `pnpm install --frozen-lockfile`
-   - Build Command: `pnpm run build:web`
-   - Output Directory: `apps/web/out`
+   - Build Command: `pnpm -w run build:web`
+   - Output Directory: `out`
 4. Setelah pengaturan disimpan, setiap push ke `main` akan otomatis men-trigger deploy. Untuk deploy manual dari CLI:
    ```bash
    pnpm run build:web
