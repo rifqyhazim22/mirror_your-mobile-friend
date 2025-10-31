@@ -17,6 +17,7 @@ pnpm-debug.log*
 
 # Env files
 .env*
+!.env.example
 
 # Capacitor / platform builds
 android/

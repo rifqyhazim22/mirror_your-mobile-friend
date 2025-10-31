@@ -31,6 +31,7 @@
     "turbo": "^2.2.3"
   },
   "dependencies": {
-    "@capacitor/core": "5.7.8"
+    "@capacitor/core": "5.7.8",
+    "openai": "^6.7.0"
   }
 }

@@ -17,29 +17,29 @@ Backlog berikut mengelompokkan pekerjaan MVP (Fase 1) menjadi _epic_ dan _user s
   - Selesai bila: Uji penetrasi dasar lulus, >80% endpoints terlindungi guard auth.
 
 ## Epic B – Pengalaman Onboarding Empatik
-- **B1. Flow Registrasi Gen Z**
+- **B1. Flow Registrasi Gen Z** ✅ v0 tersedia di `/experience` (3 langkah onboarding empatik).
   - Outcome: UI onboarding (sapaan avatar, pengambilan nama panggilan, preferensi).
   - Dependensi: Design system, avatar assets.
   - Selesai bila: Usability test (5 pengguna) menunjukkan >80% memahami alur.
-- **B2. Tes MBTI & Enneagram Singkat**
+- **B2. Tes MBTI & Enneagram Singkat** — TODO (belum ada kuis, baru fokus area onboarding).
   - Outcome: Kuis interaktif, scoring, penyimpanan hasil, penjelasan tipe.
   - Dependensi: Konten psikologi terkurasi.
   - Selesai bila: Hasil tersimpan ke profil, insight tampil di dashboard.
-- **B3. Consent Kamera & Privasi**
+- **B3. Consent Kamera & Privasi** ✅ consent & toggle kamera terhubung ke radar emosi lokal.
   - Outcome: Dialog izin kamera, edukasi privasi, toggle emosi per sesi.
   - Dependensi: Modul detection siap.
   - Selesai bila: Pengguna dapat menonaktifkan kamera kapan pun, state tercermin di backend.
 
 ## Epic C – Chat AI Empatik
-- **C1. Workspace Chat**
+- **C1. Workspace Chat** ✅ Chat playground siap dengan UI liquid-glass + state management.
   - Outcome: Tampilan chat mirip messenger, status mengetik, avatar AI adaptif.
   - Dependensi: Design system, store state.
   - Selesai bila: Percakapan dummy flow berfungsi offline (mock).
-- **C2. Orkestrasi LLM**
+- **C2. Orkestrasi LLM** ✅ Next.js API → OpenAI `gpt-5.0-nano` (Responses API) + persona prompting.
   - Outcome: Gateway API -> service AI -> LLM -> response guard -> persist log.
   - Dependensi: Secret LLM, guardrails policy.
   - Selesai bila: >50 skenario test lintas emosi lolos, output tersimpan.
-- **C3. Guardrails & Moderasi**
+- **C3. Guardrails & Moderasi** — TODO (respon belum diproteksi, tambahkan moderation di fase berikut).
   - Outcome: Filtering konten SARA/bunuh diri, fallback ke human prompt.
   - Dependensi: Integration OpenAI Moderation / custom classifier.
   - Selesai bila: Semua test red-team (kata berbahaya) memicu protocol aman.

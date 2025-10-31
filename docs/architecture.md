@@ -18,14 +18,16 @@ Dokumen ini merumuskan arsitektur awal untuk merealisasikan visi pada _Konsep Ap
 - **Client Apps**
   - Next.js 14 (App Router, TypeScript) sebagai PWA responsif.
   - Tailwind CSS + CSS Variables untuk tema, Framer Motion untuk animasi mikro, Zustand + React Query untuk manajemen state.
-  - Modul deteksi emosi lokal menggunakan `@vladmandic/face-api` (TensorFlow.js) dengan fallback ke layanan cloud jika device tidak mampu.
+  - Modul deteksi emosi lokal menggunakan `@vladmandic/human` (TensorFlow.js) dengan fallback ke layanan cloud jika device tidak mampu.
   - WebRTC untuk akses kamera, Web Workers untuk inferensi non-blocking, Service Worker untuk mode offline terbatas & notifikasi push.
+  - Halaman `/experience` menggabungkan onboarding empatik dan chat playground yang memanggil API internal `/api/mirror-chat`.
   - Packaging lintas platform: Capacitor (Android/iOS) & `@capacitor-community/electron` untuk desktop shell dari bundle Next.js `apps/web/out`.
 - **API Gateway (apps/api)**
   - NestJS (TypeScript) + Fastify adapter, modul modular (Auth, User, Profile, Chat, Journal, Emotion, Psychologist, Notifications, Admin).
   - GraphQL (Apollo) untuk query kompleks front-end + REST minimal untuk webhook/push.
   - Socket.IO adapter untuk event real-time (status psikolog, progress respon AI).
   - Prisma ORM untuk PostgreSQL, Mongoose atau Prisma Mongo untuk log chat.
+  - Modul `ProfilesModule` (sementara in-memory) menerima data onboarding dari Next.js.
 - **AI Orchestration (services/ai)**
   - FastAPI (Python) microservice menjalankan pipeline NLP & analitik:
     - Guardrails (OpenAI Moderation, custom RAG rules).
@@ -41,7 +43,7 @@ Dokumen ini merumuskan arsitektur awal untuk merealisasikan visi pada _Konsep Ap
   - S3-compatible: bukti identitas psikolog, catatan audio (jika diizinkan), export data user.
   - LangChain Vector Store (PostgreSQL pgvector atau Pinecone) untuk retrieval konten psikologi & journaling.
 - **Integrasi Eksternal**
-  - LLM provider (Azure OpenAI GPT-4o) + fallback open-source (LLaMA 3) via Ollama + guardrails.
+  - LLM provider (Azure OpenAI GPT-4o) + fallback open-source (LLaMA 3) via Ollama + guardrails. Prototipe terbaru memakai langsung OpenAI Responses API (`gpt-5.0-nano`).
   - Payment gateway (Midtrans/Xendit) untuk sesi psikolog berbayar.
   - Notifikasi: Firebase Cloud Messaging untuk push, Resend/Sendgrid untuk email.
   - Kalender psikolog: integrasi Cal.com / Google Calendar API untuk sinkronisasi jadwal.
