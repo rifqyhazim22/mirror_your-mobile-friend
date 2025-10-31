@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build --webpack",
+    "build": "next build --webpack && mkdir -p out && cp -f routes-manifest.json out/routes-manifest.json",
     "start": "next start",
     "lint": "eslint"
   },
