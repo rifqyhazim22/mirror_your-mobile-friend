@@ -1,0 +1,33 @@
+{
+  "name": "mirror",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.20.0",
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api dev",
+    "build": "turbo run build",
+    "build:web": "pnpm --filter web build",
+    "build:api": "pnpm --filter api build",
+    "build:android": "pnpm run build:web && pnpm exec cap sync android",
+    "build:ios": "pnpm run build:web && pnpm exec cap sync ios",
+    "build:desktop": "pnpm run build:web && pnpm exec cap sync @capacitor-community/electron",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{js,ts,tsx,json,md,css,scss}\"",
+    "format:check": "prettier --check \"**/*.{js,ts,tsx,json,md,css,scss}\"",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "cap": "cap"
+  },
+  "devDependencies": {
+    "@capacitor-community/electron": "5.0.1",
+    "@capacitor/android": "5.7.8",
+    "@capacitor/cli": "5.7.8",
+    "@capacitor/ios": "5.7.8",
+    "prettier": "^3.3.3",
+    "turbo": "^2.2.3"
+  },
+  "dependencies": {
+    "@capacitor/core": "5.7.8"
+  }
+}

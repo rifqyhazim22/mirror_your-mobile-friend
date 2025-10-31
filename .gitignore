@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+coverage/
+
+# Logs & caches
+*.log
+pnpm-debug.log*
+.turbo/
+.DS_Store
+.cache/
+
+# Env files
+.env*
+
+# Capacitor / platform builds
+android/
+ios/
+electron/
+
+# Python env
+venv/
+.venv/
+__pycache__/
+
+# Misc
+.idea/
+.vscode/

@@ -1,0 +1,36 @@
+[project]
+name = "mirror-ai"
+version = "0.1.0"
+description = "AI orchestration service for Mirror"
+authors = [{ name = "Mirror Team" }]
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115.0,<1.0",
+  "uvicorn[standard]>=0.30.0,<1.0",
+  "pydantic>=2.7.0,<3.0",
+  "python-dotenv>=1.0.0,<2.0",
+  "httpx>=0.27.0,<1.0",
+  "redis>=5.0.0,<6.0",
+  "celery>=5.4.0,<6.0",
+  "langchain>=0.3.0,<0.4.0",
+  "openai>=1.55.0,<2.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "black>=24.4.0,<25.0",
+  "ruff>=0.7.0,<0.8.0",
+  "pytest>=8.3.0,<9.0"
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "I"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]

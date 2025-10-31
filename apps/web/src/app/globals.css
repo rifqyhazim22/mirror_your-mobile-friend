@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+:root {
+  --background: #060318;
+  --background-accent: #120f3b;
+  --background-radial: rgba(122, 92, 255, 0.35);
+  --glass-base: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.22);
+  --glass-highlight: rgba(255, 255, 255, 0.45);
+  --glass-shadow: rgba(8, 6, 31, 0.75);
+  --foreground: #f8f7ff;
+  --accent: #7a5cff;
+  --accent-secondary: #ff73c2;
+  --glow: 0 0 120px rgba(122, 92, 255, 0.25);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at 10% 20%, rgba(122, 92, 255, 0.25), transparent 45%),
+    radial-gradient(circle at 90% 10%, rgba(255, 115, 194, 0.3), transparent 50%),
+    linear-gradient(160deg, var(--background) 0%, var(--background-accent) 100%);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  overscroll-behavior: none;
+}
+
+.bg-night {
+  background: radial-gradient(circle at 10% 20%, rgba(122, 92, 255, 0.32), transparent 45%),
+    radial-gradient(circle at 95% 15%, rgba(255, 115, 194, 0.35), transparent 55%),
+    linear-gradient(150deg, var(--background) 0%, var(--background-accent) 100%);
+  min-height: 100vh;
+}
+
+.glass-panel {
+  background: var(--glass-base);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  backdrop-filter: blur(24px) saturate(140%);
+  box-shadow: 0 20px 60px rgba(3, 0, 20, 0.35);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.glass-panel:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.32);
+  box-shadow: 0 28px 80px rgba(8, 2, 35, 0.5);
+}
+
+.glass-divider {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+button {
+  font-family: inherit;
+}
+
+.text-gradient {
+  background: linear-gradient(120deg, #ffe7ff 0%, #c7b9ff 55%, #7a5cff 100%);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  padding: 0.35rem 0.9rem;
+  backdrop-filter: blur(16px);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
