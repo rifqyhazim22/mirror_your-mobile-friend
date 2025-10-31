@@ -27,6 +27,19 @@ pnpm run build:ios          # build web + sync ke proyek iOS
 
 > `pnpm exec cap add android|ios|@capacitor-community/electron` perlu dijalankan sekali sebelum script build lintas platform.
 
+## Deploy ke Vercel
+1. Pastikan sudah login Vercel: `npm i -g vercel` lalu `vercel login` (sekali).
+2. Hubungkan repo GitHub ini ke project Vercel dan set **Root Directory** = `.` (atau langsung import via Vercel UI).
+3. Konfigurasi yang dipakai Vercel:
+   - Install Command: `pnpm install --frozen-lockfile`
+   - Build Command: `pnpm run build:web`
+   - Output Directory: `apps/web/out`
+4. Setelah pengaturan disimpan, setiap push ke `main` akan otomatis men-trigger deploy. Untuk deploy manual dari CLI:
+   ```bash
+   pnpm run build:web
+   npx vercel deploy --prebuilt
+   ```
+
 ## Next Steps
 1. Implementasi modul chat AI + integrasi kamera/on-device emotion detection.
 2. Penyatuan backend NestJS dan layanan AI FastAPI (auth, guardrails, journaling).

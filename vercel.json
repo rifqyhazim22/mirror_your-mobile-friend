@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "framework": "nextjs",
+  "buildCommand": "pnpm run build:web",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "outputDirectory": "apps/web/out",
+  "devCommand": "pnpm dev:web",
+  "env": {
+    "NEXT_PUBLIC_APP_NAME": "Mirror"
+  }
+}
