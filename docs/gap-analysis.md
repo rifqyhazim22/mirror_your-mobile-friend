@@ -3,7 +3,7 @@
 Ringkasan item penting dari dokumen "Konsep Aplikasi Web Mirror – Teman Curhat AI Personal (2025)" yang **belum** terealisasi pada fase repositori saat ini.
 
 ## Fitur Produk
-- Chatbot AI empatik (mode bebas & CBT) belum diintegrasikan – halaman saat ini masih landing page statis.
+- Chatbot AI empatik (mode bebas & CBT) belum diintegrasikan – saat ini baru tersedia playground UI statis tanpa backend.
 - Deteksi emosi wajah real-time (TensorFlow.js / face-api.js) belum diimplementasi.
 - Profil kepribadian (MBTI, Enneagram, Jungian archetype, zodiak) belum memiliki UI maupun logika kuis.
 - Jurnal mood harian, kalender mood, serta insight mingguan belum tersedia.
@@ -21,7 +21,7 @@ Ringkasan item penting dari dokumen "Konsep Aplikasi Web Mirror – Teman Curhat
 - Compliance & privacy guard (consent versioning, data deletion pipeline) belum diimplementasi.
 
 ## UX & Konten
-- Onboarding empatik & kuis interaktif belum ada (baru CTA di landing).
+- Onboarding empatik multi-langkah sudah ada di `/experience`, namun belum terhubung ke AI/analitik sesungguhnya.
 - Dashboard personalisasi, mood board, adaptive persona, dan modul konten psikologi belum dibuat.
 - Bahasa & tone sudah empatik, namun guideline internal (no-judgement, safety prompts) belum terkodekan.
 - Liquid-glass style hanya diterapkan di landing page; design system (packages/ui) belum diisi komponen reusable.
@@ -32,7 +32,7 @@ Ringkasan item penting dari dokumen "Konsep Aplikasi Web Mirror – Teman Curhat
 - Dokumentasi pemasaran (branding kit, konten kampanye) belum ada.
 
 ## Langkah Lanjut Prioritas
-1. Validasi UX lanjutan → implementasi onboarding empatik + prototipe chat statis.
+1. Sambungkan frontend onboarding + chat ke backend mock/LLM agar respon AI empatik bisa diuji.
 2. Setup backend dasar (auth, user profile, consent) + koneksi database.
 3. Integrasi AI service placeholder (mocked LLM) dan pipeline deteksi emosi sederhana.
 4. Penguatan keamanan (env management, lint/test pipelines, GDPR/PDP compliance draft).
