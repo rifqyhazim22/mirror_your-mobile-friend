@@ -35,8 +35,8 @@ pnpm run build:ios          # build web + sync ke proyek iOS
 
 ## Development
 ```bash
-pnpm dev:web                   # http://localhost:3000
-PORT=3001 pnpm dev:api         # http://localhost:3001 (atau set API_PORT di env)
+pnpm dev:web                     # http://localhost:3000
+API_PORT=3001 pnpm dev:api       # http://localhost:3001 (atau set di .env.local)
 ```
 
 API sementara:
