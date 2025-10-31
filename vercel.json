@@ -4,7 +4,7 @@
   "framework": "nextjs",
   "buildCommand": "pnpm -w run build:web",
   "installCommand": "pnpm install --frozen-lockfile",
-  "outputDirectory": "../apps/web/out",
+  "outputDirectory": "apps/web/out",
   "devCommand": "pnpm dev:web",
   "env": {
     "NEXT_PUBLIC_APP_NAME": "Mirror"
