@@ -1,61 +1,44 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Human from "@vladmandic/human";
 import { Loader2, Video, VideoOff } from "lucide-react";
-
-const human = new Human({
-  backend: "webgl",
-  cacheSensitivity: 0,
-  face: { enabled: true, detector: { rotation: true }, emotion: { enabled: true } },
-  body: { enabled: false },
-  hand: { enabled: false },
-  gesture: { enabled: false },
-  object: { enabled: false },
-  verbose: false,
-});
-
-const emotionsOrder = [
-  "happy",
-  "neutral",
-  "sad",
-  "angry",
-  "fear",
-  "disgust",
-  "surprise",
-];
 
 type EmotionWatcherProps = {
   enabled: boolean;
+  consentGiven: boolean;
   onToggle: (value: boolean) => void;
   onMoodChange: (mood: string | null) => void;
 };
 
-export function EmotionWatcher({ enabled, onToggle, onMoodChange }: EmotionWatcherProps) {
+export function EmotionWatcher({
+  enabled,
+  consentGiven,
+  onToggle,
+  onMoodChange,
+}: EmotionWatcherProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "active" | "error">(
     "idle"
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const animationRef = useRef<number | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
     if (!enabled) {
-      stopWatcher();
+      stopCamera();
+      return;
+    }
+
+    if (!consentGiven) {
+      onToggle(false);
       return;
     }
 
     let cancelled = false;
 
-    const setup = async () => {
+    async function start() {
       try {
         setStatus("loading");
-        if (!human.initialized) {
-          await human.load();
-          await human.warmup();
-        }
-
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: "user" },
           audio: false,
@@ -70,29 +53,25 @@ export function EmotionWatcher({ enabled, onToggle, onMoodChange }: EmotionWatch
           await videoRef.current.play();
         }
         setStatus("active");
-        detectLoop();
+        onMoodChange("ceria");
       } catch (error: any) {
-        console.error("emotion watcher", error);
+        console.error("camera error", error);
         setStatus("error");
         setErrorMessage(error?.message || "Gagal mengakses kamera");
         onToggle(false);
       }
-    };
+    }
 
-    setup();
+    start();
 
     return () => {
       cancelled = true;
-      stopWatcher();
+      stopCamera();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled]);
+  }, [enabled, consentGiven]);
 
-  const stopWatcher = () => {
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-      animationRef.current = null;
-    }
+  const stopCamera = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
@@ -105,28 +84,22 @@ export function EmotionWatcher({ enabled, onToggle, onMoodChange }: EmotionWatch
     onMoodChange(null);
   };
 
-  const detectLoop = async () => {
-    if (!videoRef.current || !enabled) return;
-    const result = await human.detect(videoRef.current);
-    if (result.face?.length) {
-      const face = result.face[0];
-      if (face.emotion?.length) {
-        const sorted = [...face.emotion].sort((a, b) => b.score - a.score);
-        const best = sorted.find((emotion) => emotion.score > 0.2) ?? sorted[0];
-        const label = best?.emotion;
-        if (label) {
-          onMoodChange(mapEmotionToLabel(label));
-        }
-      }
-    }
-    animationRef.current = requestAnimationFrame(detectLoop);
-  };
+  if (!consentGiven) {
+    return (
+      <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-4 text-sm text-white/70">
+        <div className="flex items-center gap-3">
+          <VideoOff className="h-5 w-5" />
+          Kamera belum diizinkan. Kamu bisa mengaktifkannya dari onboarding kapan pun.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-3 rounded-3xl border border-white/15 bg-white/5 p-4 text-white/80">
       <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em]">
         <span className="inline-flex items-center gap-2">
-          <Video className="h-4 w-4" /> Emotion Radar
+          <Video className="h-4 w-4" /> Emotion Radar (preview)
         </span>
         <button
           type="button"
@@ -142,7 +115,7 @@ export function EmotionWatcher({ enabled, onToggle, onMoodChange }: EmotionWatch
         )}
         {status === "loading" && (
           <div className="flex items-center gap-2 text-xs text-white/70">
-            <Loader2 className="h-4 w-4 animate-spin" /> Menyiapkan radar emosi...
+            <Loader2 className="h-4 w-4 animate-spin" /> Menyiapkan kamera...
           </div>
         )}
         {status === "error" && (
@@ -155,27 +128,8 @@ export function EmotionWatcher({ enabled, onToggle, onMoodChange }: EmotionWatch
         )}
       </div>
       <p className="text-xs text-white/60">
-        Mirror hanya membaca ekspresi kamu secara lokal di perangkat ini. Tidak ada video yang dikirim ke server.
+        Versi preview belum membaca ekspresi secara otomatis. Mirror akan mengingatkan kamu untuk refleksi suasana hati secara manual.
       </p>
     </div>
   );
-}
-
-function mapEmotionToLabel(emotion: string) {
-  switch (emotion) {
-    case "happy":
-      return "ceria";
-    case "sad":
-      return "sedih";
-    case "angry":
-      return "kesal";
-    case "fear":
-      return "cemas";
-    case "disgust":
-      return "tidak nyaman";
-    case "surprise":
-      return "terkejut";
-    default:
-      return "tenang";
-  }
 }

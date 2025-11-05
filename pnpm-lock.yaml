@@ -136,9 +136,6 @@ importers:
       '@ducanh2912/next-pwa':
         specifier: 10.0.2
         version: 10.0.2(@types/babel__core@7.20.5)(next@16.0.1(@babel/core@7.28.5)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(webpack@5.100.2)
-      '@vladmandic/human':
-        specifier: ^3.3.6
-        version: 3.3.6
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -1952,10 +1949,6 @@ packages:
     resolution: {integrity: sha512-lrW200hZdbfRtztbygyaq/6jP6AKE8qQN2KvPcJ+x7wiD038YtnYtZ82IMNJ69GJibV7bwL3y9FgK+5w/pYt6g==}
     cpu: [x64]
     os: [win32]
-
-  '@vladmandic/human@3.3.6':
-    resolution: {integrity: sha512-Nr5mPfq1gQ+uKeXY5uM3Fj8UxvF5CEh2s6txM5wRThqaW0mF9huooOuZSrT8hhGho0hGaXLFdAwfD/2+teCv6A==}
-    engines: {node: '>=14.0.0'}
 
   '@webassemblyjs/ast@1.14.1':
     resolution: {integrity: sha512-nuBEDgQfm1ccRp/8bCQrx1frohyufl4JlbMMZ4P1wpeOfDhF6FQkxZJ1b/e+PLwr6X1Nhw6OLme5usuBWYBvuQ==}
@@ -7373,8 +7366,6 @@ snapshots:
 
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
-
-  '@vladmandic/human@3.3.6': {}
 
   '@webassemblyjs/ast@1.14.1':
     dependencies:

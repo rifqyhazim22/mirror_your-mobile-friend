@@ -300,6 +300,7 @@ function EmotionSection({
   return (
     <EmotionWatcher
       enabled={enabled}
+      consentGiven={consentGiven}
       onToggle={onToggle}
       onMoodChange={onMoodChange}
     />

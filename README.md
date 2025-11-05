@@ -6,7 +6,7 @@ Mirror adalah aplikasi teman curhat virtual berbasis AI yang berfokus pada dukun
 - Struktur monorepo pnpm + Turborepo dengan workspace `apps/web`, `apps/api`, `services/ai`, dan paket bersama.
 - Landing page Next.js bernuansa liquid-glass + emotikon empatik, siap sebagai PWA (next-pwa).
 - Halaman pengalaman `/experience` menghadirkan onboarding empatik multi-langkah + simulasi chat Mirror.
-- Chat playground sudah terhubung ke LLM OpenAI (`gpt-5.0-nano`) lengkap dengan radar emosi kamera opsional.
+- Chat playground sudah terhubung ke LLM OpenAI (`gpt-5.0-nano`). Radar emosi sementara berupa preview kamera manual (deteksi otomatis akan hadir kemudian).
 - Konfigurasi Capacitor (Android, iOS, Electron) untuk menghasilkan APK dan aplikasi desktop dari bundle Next.
 - Dokumentasi build lintas platform: `docs/install-android.md`, `docs/install-desktop.md`, `docs/install-pwa.md`.
 

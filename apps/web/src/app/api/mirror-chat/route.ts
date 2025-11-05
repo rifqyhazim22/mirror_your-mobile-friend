@@ -58,14 +58,12 @@ export async function POST(request: Request) {
   try {
     const response = await openai.responses.create({
       model: modelName,
-      messages: requestMessages.map((message) => ({
+      input: requestMessages.map((message) => ({
         role: message.role,
         content: message.content,
       })),
       max_output_tokens: 450,
       temperature: 0.85,
-      presence_penalty: 0.2,
-      frequency_penalty: 0.3,
     });
 
     const text = response.output_text?.trim();

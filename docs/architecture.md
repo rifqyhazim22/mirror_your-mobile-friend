@@ -18,9 +18,9 @@ Dokumen ini merumuskan arsitektur awal untuk merealisasikan visi pada _Konsep Ap
 - **Client Apps**
   - Next.js 14 (App Router, TypeScript) sebagai PWA responsif.
   - Tailwind CSS + CSS Variables untuk tema, Framer Motion untuk animasi mikro, Zustand + React Query untuk manajemen state.
-  - Modul deteksi emosi lokal menggunakan `@vladmandic/human` (TensorFlow.js) dengan fallback ke layanan cloud jika device tidak mampu.
+  - Modul deteksi emosi lokal akan memakai model ringan; versi saat ini menyediakan preview kamera manual sambil menunggu integrasi final.
   - WebRTC untuk akses kamera, Web Workers untuk inferensi non-blocking, Service Worker untuk mode offline terbatas & notifikasi push.
-  - Halaman `/experience` menggabungkan onboarding empatik dan chat playground yang memanggil API internal `/api/mirror-chat`.
+  - Halaman `/experience` menggabungkan onboarding empatik dan chat playground yang memanggil API internal `/api/mirror-chat` serta opsi kamera preview.
   - Packaging lintas platform: Capacitor (Android/iOS) & `@capacitor-community/electron` untuk desktop shell dari bundle Next.js `apps/web/out`.
 - **API Gateway (apps/api)**
   - NestJS (TypeScript) + Fastify adapter, modul modular (Auth, User, Profile, Chat, Journal, Emotion, Psychologist, Notifications, Admin).

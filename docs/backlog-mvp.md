@@ -25,7 +25,7 @@ Backlog berikut mengelompokkan pekerjaan MVP (Fase 1) menjadi _epic_ dan _user s
   - Outcome: Kuis interaktif, scoring, penyimpanan hasil, penjelasan tipe.
   - Dependensi: Konten psikologi terkurasi.
   - Selesai bila: Hasil tersimpan ke profil, insight tampil di dashboard.
-- **B3. Consent Kamera & Privasi** ✅ consent & toggle kamera terhubung ke radar emosi lokal.
+- **B3. Consent Kamera & Privasi** ✅ consent & toggle kamera terhubung ke preview kamera (deteksi otomatis dijadwalkan).
   - Outcome: Dialog izin kamera, edukasi privasi, toggle emosi per sesi.
   - Dependensi: Modul detection siap.
   - Selesai bila: Pengguna dapat menonaktifkan kamera kapan pun, state tercermin di backend.
