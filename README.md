@@ -7,6 +7,7 @@ Mirror adalah aplikasi teman curhat virtual berbasis AI yang berfokus pada dukun
 - Landing page Next.js bernuansa liquid-glass + emotikon empatik, siap sebagai PWA (next-pwa).
 - Halaman pengalaman `/experience` menghadirkan onboarding empatik multi-langkah + simulasi chat Mirror.
 - Chat playground sudah terhubung ke LLM OpenAI (`gpt-5.0-nano`). Radar emosi sementara berupa preview kamera manual (deteksi otomatis akan hadir kemudian).
+- Mini mood journal untuk mencatat suasana hati setelah sesi chat (disimpan lokal).
 - Konfigurasi Capacitor (Android, iOS, Electron) untuk menghasilkan APK dan aplikasi desktop dari bundle Next.
 - Dokumentasi build lintas platform: `docs/install-android.md`, `docs/install-desktop.md`, `docs/install-pwa.md`.
 
@@ -30,8 +31,11 @@ pnpm run build:ios          # build web + sync ke proyek iOS
 > `pnpm exec cap add android|ios|@capacitor-community/electron` perlu dijalankan sekali sebelum script build lintas platform.
 
 ## Environment Variables
-- Duplikasi `.env.example` menjadi `.env.local` lalu isi `OPENAI_API_KEY` dengan kunci OpenAI project kamu.
-- Saat deploy, set variable yang sama pada Vercel Project Settings.
+- Duplikasi `.env.example` menjadi `.env.local` lalu isi:
+  - `OPENAI_API_KEY` – OpenAI project key.
+  - `API_PORT` (opsional) – port untuk NestJS lokal.
+  - `NEXT_PUBLIC_MIRROR_API_URL` – base URL API (contoh: `http://localhost:3001/v1`).
+- Saat deploy, set variabel yang sama di Vercel / platform yang kamu pakai.
 
 ## Development
 ```bash

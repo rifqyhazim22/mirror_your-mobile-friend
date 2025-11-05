@@ -3,17 +3,18 @@
 Ringkasan item penting dari dokumen "Konsep Aplikasi Web Mirror – Teman Curhat AI Personal (2025)" yang **belum** terealisasi pada fase repositori saat ini.
 
 ## Fitur Produk
-- Chatbot AI empatik (mode bebas & CBT) belum diintegrasikan – saat ini baru tersedia playground UI statis tanpa backend.
-- Deteksi emosi wajah real-time (TensorFlow.js / face-api.js) belum diimplementasi.
+- Chatbot AI empatik penuh (dengan flow CBT & sesi terstruktur) masih belum ada – versi kini memakai LLM umum + prompt empatik tanpa orchestrator kompleks.
+- Deteksi emosi wajah real-time belum diimplementasi (preview kamera manual sementara).
 - Profil kepribadian (MBTI, Enneagram, Jungian archetype, zodiak) belum memiliki UI maupun logika kuis.
-- Jurnal mood harian, kalender mood, serta insight mingguan belum tersedia.
+- Jurnal mood harian & insight mingguan baru sebatas mood journal manual lokal.
 - Avatar AI adaptif & feedback emotif (emoji avatar) masih konsep.
 - Integrasi psikolog profesional (booking, live chat/video call, treatment plan) belum dimulai.
 - Fitur emergency/panic button dan protokol escalasi belum dibuat.
 - Community/forum terkurasi dan konten interaktif (meditasi, mini-game coping) belum ada.
 
 ## Teknologi & Infrastruktur
-- Backend NestJS masih boilerplate tanpa modul (Auth, Chat, Journal, Emotion, Notifications, Psychologist).
+- Backend NestJS baru memiliki modul profil in-memory; auth/chat/journal/emotion, dsb. masih kosong.
+- Guardrails awal menggunakan moderation OpenAI di Next.js; belum ada lapisan backend tersentral atau logging audit.
 - Layanan AI FastAPI belum memiliki endpoint LLM, guardrails, sentiment analysis, atau task Celery.
 - Database (Postgres, Mongo, Redis) dan Prisma schema belum disiapkan.
 - Observability (OpenTelemetry, Sentry, log structured) belum dikonfigurasi.
@@ -32,7 +33,7 @@ Ringkasan item penting dari dokumen "Konsep Aplikasi Web Mirror – Teman Curhat
 - Dokumentasi pemasaran (branding kit, konten kampanye) belum ada.
 
 ## Langkah Lanjut Prioritas
-1. Sambungkan frontend onboarding + chat ke backend mock/LLM agar respon AI empatik bisa diuji.
-2. Setup backend dasar (auth, user profile, consent) + koneksi database.
-3. Integrasi AI service placeholder (mocked LLM) dan pipeline deteksi emosi sederhana.
+1. Persistenkan profil & percakapan ke storage nyata (Postgres) + tambahkan autentikasi dasar.
+2. Kembangkan modul jurnal/emotion di backend serta insight mingguan otomatis.
+3. Tambahkan guardrails lanjutan (policy engine, logging, human-in-the-loop) dan integrasi deteksi emosi sebenarnya.
 4. Penguatan keamanan (env management, lint/test pipelines, GDPR/PDP compliance draft).

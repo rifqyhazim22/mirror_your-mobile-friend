@@ -54,16 +54,22 @@ export default function ExperiencePage() {
     resetProfile,
     hydrated,
     isComplete,
+    persistProfile,
+    syncStatus,
+    profileId,
   } = useMirrorProfile();
 
   const [stepIndex, setStepIndex] = useState(0);
   const [mode, setMode] = useState<"onboarding" | "chat">("onboarding");
+  const [autoEntered, setAutoEntered] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (hydrated && isComplete) {
+    if (!autoEntered && hydrated && isComplete && profileId) {
       setMode("chat");
+      setAutoEntered(true);
     }
-  }, [hydrated, isComplete]);
+  }, [hydrated, isComplete, profileId, autoEntered]);
 
   useEffect(() => {
     if (mode === "onboarding" && isComplete) {
@@ -73,12 +79,21 @@ export default function ExperiencePage() {
 
   const activeStep = orderedSteps[stepIndex];
   const showBack = mode === "onboarding" && stepIndex > 0;
+  const isSyncing = syncStatus === "loading";
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (stepIndex < orderedSteps.length - 1) {
       setStepIndex((prev) => prev + 1);
     } else {
-      setMode("chat");
+      try {
+        setSubmitError(null);
+        await persistProfile();
+        setAutoEntered(true);
+        setMode("chat");
+      } catch (error: any) {
+        console.error(error);
+        setSubmitError(error?.message || "Gagal menyimpan profil. Coba lagi ya 💛");
+      }
     }
   };
 
@@ -249,28 +264,39 @@ export default function ExperiencePage() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  disabled={onboardingDisabled}
+                  disabled={onboardingDisabled || isSyncing}
                   className="inline-flex items-center gap-2 rounded-full bg-white/90 px-6 py-2 text-sm font-semibold text-[#5c4bff] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-white/40 disabled:text-[#867fff]"
                 >
                   {stepIndex === orderedSteps.length - 1 ? (
                     <>
-                      Mulai ngobrol 💬
-                      <PartyPopper className="h-4 w-4" />
+                      {isSyncing ? (
+                        "Menyimpan profil..."
+                      ) : (
+                        <>
+                          Mulai ngobrol 💬
+                          <PartyPopper className="h-4 w-4" />
+                        </>
+                      )}
                     </>
                   ) : (
                     "Lanjut"
                   )}
                 </button>
               </div>
+              {submitError && (
+                <p className="text-xs text-rose-200">{submitError}</p>
+              )}
             </div>
           </section>
         ) : (
           <ChatPlayground
             profile={profile}
+            profileId={profileId}
             onReset={() => {
               resetProfile();
               setMode("onboarding");
               setStepIndex(0);
+              setAutoEntered(false);
             }}
           />
         )}

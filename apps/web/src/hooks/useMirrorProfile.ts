@@ -11,6 +11,7 @@ export type MirrorProfile = {
 };
 
 const STORAGE_KEY = "mirror-profile";
+const PROFILE_ID_KEY = "mirror-profile-id";
 
 const defaultProfile: MirrorProfile = {
   nickname: "",
@@ -23,6 +24,12 @@ const defaultProfile: MirrorProfile = {
 export function useMirrorProfile() {
   const [profile, setProfile] = useState<MirrorProfile>(defaultProfile);
   const [hydrated, setHydrated] = useState(false);
+  const [profileId, setProfileId] = useState<string | null>(null);
+  const [syncStatus, setSyncStatus] = useState<
+    "idle" | "loading" | "error"
+  >("idle");
+  const apiBase =
+    process.env.NEXT_PUBLIC_MIRROR_API_URL ?? "http://localhost:3001/v1";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -31,6 +38,10 @@ export function useMirrorProfile() {
       if (stored) {
         const parsed = JSON.parse(stored) as MirrorProfile;
         setProfile({ ...defaultProfile, ...parsed });
+      }
+      const storedId = window.localStorage.getItem(PROFILE_ID_KEY);
+      if (storedId) {
+        setProfileId(storedId);
       }
     } catch (error) {
       console.warn("Mirror profile hydration failed", error);
@@ -43,6 +54,47 @@ export function useMirrorProfile() {
     if (!hydrated || typeof window === "undefined") return;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
   }, [profile, hydrated]);
+
+  useEffect(() => {
+    if (!profileId) {
+      return;
+    }
+    const controller = new AbortController();
+    const fetchProfile = async () => {
+      try {
+        setSyncStatus("loading");
+        const response = await fetch(`${apiBase}/profiles/${profileId}`, {
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch profile ${profileId}`);
+        }
+        const data = (await response.json()) as MirrorProfile & {
+          id: string;
+        };
+        setProfile({
+          nickname: data.nickname,
+          focusAreas: data.focusAreas,
+          consentCamera: data.consentCamera,
+          consentData: data.consentData,
+          moodBaseline: data.moodBaseline,
+        });
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        console.warn("Failed to load profile from API", error);
+        if (typeof window !== "undefined") {
+          window.localStorage.removeItem(PROFILE_ID_KEY);
+        }
+        setProfileId(null);
+      } finally {
+        if (!controller.signal.aborted) {
+          setSyncStatus("idle");
+        }
+      }
+    };
+    fetchProfile();
+    return () => controller.abort();
+  }, [apiBase, profileId]);
 
   const updateProfile = useCallback(
     (update: Partial<MirrorProfile>) => {
@@ -65,7 +117,9 @@ export function useMirrorProfile() {
     setProfile(defaultProfile);
     if (typeof window !== "undefined") {
       window.localStorage.removeItem(STORAGE_KEY);
+      window.localStorage.removeItem(PROFILE_ID_KEY);
     }
+    setProfileId(null);
   }, []);
 
   const isComplete = useMemo(() => {
@@ -76,6 +130,49 @@ export function useMirrorProfile() {
     );
   }, [profile]);
 
+  const persistProfile = useCallback(async () => {
+    if (!isComplete) {
+      return null;
+    }
+    try {
+      setSyncStatus("loading");
+      const method = profileId ? "PUT" : "POST";
+      const endpoint = profileId
+        ? `${apiBase}/profiles/${profileId}`
+        : `${apiBase}/profiles`;
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(profile),
+      });
+      if (!response.ok) {
+        throw new Error("Gagal menyimpan profil");
+      }
+      const data = (await response.json()) as MirrorProfile & { id: string };
+      setProfile({
+        nickname: data.nickname,
+        focusAreas: data.focusAreas,
+        consentCamera: data.consentCamera,
+        consentData: data.consentData,
+        moodBaseline: data.moodBaseline,
+      });
+      if (!profileId) {
+        setProfileId(data.id);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(PROFILE_ID_KEY, data.id);
+        }
+      }
+      setSyncStatus("idle");
+      return data.id;
+    } catch (error) {
+      console.error(error);
+      setSyncStatus("error");
+      throw error;
+    }
+  }, [apiBase, isComplete, profile, profileId]);
+
   return {
     profile,
     updateProfile,
@@ -83,6 +180,9 @@ export function useMirrorProfile() {
     resetProfile,
     hydrated,
     isComplete,
+    profileId,
+    persistProfile,
+    syncStatus,
   };
 }
 

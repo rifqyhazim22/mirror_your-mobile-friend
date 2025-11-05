@@ -39,7 +39,7 @@ Backlog berikut mengelompokkan pekerjaan MVP (Fase 1) menjadi _epic_ dan _user s
   - Outcome: Gateway API -> service AI -> LLM -> response guard -> persist log.
   - Dependensi: Secret LLM, guardrails policy.
   - Selesai bila: >50 skenario test lintas emosi lolos, output tersimpan.
-- **C3. Guardrails & Moderasi** — TODO (respon belum diproteksi, tambahkan moderation di fase berikut).
+- **C3. Guardrails & Moderasi** ✅ basic OpenAI moderation + safety messaging sebelum mengirim respon.
   - Outcome: Filtering konten SARA/bunuh diri, fallback ke human prompt.
   - Dependensi: Integration OpenAI Moderation / custom classifier.
   - Selesai bila: Semua test red-team (kata berbahaya) memicu protocol aman.
@@ -53,7 +53,7 @@ Backlog berikut mengelompokkan pekerjaan MVP (Fase 1) menjadi _epic_ dan _user s
   - Outcome: Hasil emosi dikirim ke backend, disimpan, divisualisasi.
   - Dependensi: API emotion, charting library (Recharts/Victory).
   - Selesai bila: Dashboard menampilkan kalender mood interaktif.
-- **D3. Insight Harian**
+- **D3. Insight Harian** — Versi awal: mood journal manual tersimpan lokal, insight otomatis masih TODO.
   - Outcome: Job harian menyusun ringkasan mood + affirmations.
   - Dependensi: Service AI, template NLP.
   - Selesai bila: User menerima ringkasan via notifikasi + halaman insight.

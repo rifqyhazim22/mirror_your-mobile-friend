@@ -9,15 +9,7 @@ export class ProfilesService {
 
   create(payload: CreateProfileDto) {
     const id = randomUUID();
-    const profile: MirrorProfile = {
-      id,
-      nickname: (payload.nickname ?? "").trim(),
-      focusAreas: Array.isArray(payload.focusAreas) ? payload.focusAreas : [],
-      consentCamera: Boolean(payload.consentCamera),
-      consentData: Boolean(payload.consentData),
-      moodBaseline: payload.moodBaseline ?? "tenang",
-      createdAt: new Date().toISOString(),
-    };
+    const profile = this.mapPayloadToProfile(id, payload);
     this.store.set(id, profile);
     return profile;
   }
@@ -28,5 +20,33 @@ export class ProfilesService {
       throw new NotFoundException(`Profile ${id} tidak ditemukan`);
     }
     return profile;
+  }
+
+  update(id: string, payload: CreateProfileDto) {
+    if (!this.store.has(id)) {
+      throw new NotFoundException(`Profile ${id} tidak ditemukan`);
+    }
+    const updated = this.mapPayloadToProfile(id, payload, this.store.get(id)!);
+    this.store.set(id, updated);
+    return updated;
+  }
+
+  private mapPayloadToProfile(
+    id: string,
+    payload: CreateProfileDto,
+    current?: MirrorProfile,
+  ): MirrorProfile {
+    return {
+      id,
+      nickname: (payload.nickname ?? current?.nickname ?? "").trim(),
+      focusAreas: Array.isArray(payload.focusAreas)
+        ? payload.focusAreas
+        : current?.focusAreas ?? [],
+      consentCamera:
+        payload.consentCamera ?? current?.consentCamera ?? false,
+      consentData: payload.consentData ?? current?.consentData ?? false,
+      moodBaseline: payload.moodBaseline ?? current?.moodBaseline ?? "tenang",
+      createdAt: current?.createdAt ?? new Date().toISOString(),
+    };
   }
 }

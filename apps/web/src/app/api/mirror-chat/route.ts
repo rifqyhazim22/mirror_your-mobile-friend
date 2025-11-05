@@ -18,6 +18,7 @@ type ChatPayload = {
   messages: Array<{ role: "user" | "assistant" | "system"; content: string }>;
   profile?: MirrorProfilePayload;
   detectedMood?: string | null;
+  profileId?: string;
 };
 
 const FALLBACK_RESPONSE =
@@ -46,6 +47,20 @@ export async function POST(request: Request) {
   const { messages = [], profile, detectedMood } = payload;
 
   const personaSummary = buildPersonaSummary(profile, detectedMood);
+
+  const latestUserMessage = [...messages]
+    .reverse()
+    .find((message) => message.role === "user");
+
+  if (latestUserMessage?.content) {
+    const flagged = await runModeration(latestUserMessage.content);
+    if (flagged) {
+      return NextResponse.json({
+        message:
+          "Terima kasih sudah cerita. Aku khawatir kamu sedang dalam kondisi yang perlu bantuan profesional. Coba hubungi hotline darurat atau orang terpercaya ya 💛",
+      });
+    }
+  }
 
   const requestMessages = [
     {
@@ -102,4 +117,18 @@ Gunakan bahasa santai, hangat, penuh emotikon seperlunya, dan tetap ilmiah ringa
 Selalu eksplisitkan empati, validasi emosi, dan tawarkan langkah kecil praktis.
 Sesuaikan gaya dengan ${nickname} yang fokus pada ${focus}. ${mood}
 Jika percakapan mengandung indikasi bahaya, sarankan bantuan profesional dan hotline darurat.`;
+}
+
+async function runModeration(content: string) {
+  try {
+    if (!openai) return false;
+    const response = await openai.moderations.create({
+      model: "omni-moderation-latest",
+      input: content,
+    });
+    return response.results?.some((result) => result.flagged) ?? false;
+  } catch (error) {
+    console.warn("Moderation check gagal", error);
+    return false;
+  }
 }

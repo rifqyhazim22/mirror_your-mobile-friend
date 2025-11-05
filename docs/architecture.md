@@ -54,12 +54,13 @@ Dokumen ini merumuskan arsitektur awal untuk merealisasikan visi pada _Konsep Ap
 - **Chat AI**:
   - Frontend chat workspace dengan thread, reaction, timestamp.
   - API Gateway menerima pesan, call service AI untuk LLM response, sematkan metadata (deteksi emosi, sentiment).
-  - Guardrails memfilter output (moderation, safe completion). Simpan percakapan bila user setuju.
+  - Guardrails awal: moderation OpenAI + instruksi safety; pencatatan percakapan akan diperluas bersamaan dengan storage backend.
 - **Emotion Pipeline**:
   - Client inferensi -> kirim ringkasan (label, confidence) + optional frame hash ke backend.
   - Backend verifikasi rate limit, simpan di tabel `emotion_readings`.
   - Jika client tidak mampu, API dapat memproses gambar via MorphCast SDK (opsional) dengan consent khusus.
 - **Jurnal & Insight**: Cron harian bertanya kabar, data disajikan di dashboard (kalender mood, insight mingguan). Microservice AI menyusun ringkasan.
+  - Versi saat ini menyediakan mood journal lokal langsung di chat sebagai langkah awal.
 - **Psikolog Network**: CRUD direktori, booking engine, WebRTC room provisioning, catatan terapi, treatment plan, rating sistem.
 - **Emergency Flow**: Keyword detection, escalate to human (on-call psychologist), push hotline, optional notify trusted contact.
 

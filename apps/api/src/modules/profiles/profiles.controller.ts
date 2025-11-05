@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
 import { CreateProfileDto } from "./dto/create-profile.dto";
 import { ProfilesService } from "./profiles.service";
 
@@ -14,5 +14,10 @@ export class ProfilesController {
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.profilesService.findOne(id);
+  }
+
+  @Put(":id")
+  update(@Param("id") id: string, @Body() dto: CreateProfileDto) {
+    return this.profilesService.update(id, dto);
   }
 }

@@ -11,6 +11,11 @@ import {
 } from "lucide-react";
 import { MirrorProfile } from "@/hooks/useMirrorProfile";
 import { EmotionWatcher } from "@/components/emotion-watcher";
+import {
+  MoodEntry,
+  MoodTag,
+  useMoodJournal,
+} from "@/hooks/useMoodJournal";
 
 const quickReplies = [
   "Aku lagi cemas soal kuliah 😥",
@@ -27,10 +32,11 @@ type ChatMessage = {
 
 type ChatPlaygroundProps = {
   profile: MirrorProfile;
+  profileId?: string | null;
   onReset: () => void;
 };
 
-export function ChatPlayground({ profile, onReset }: ChatPlaygroundProps) {
+export function ChatPlayground({ profile, profileId, onReset }: ChatPlaygroundProps) {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>(() =>
     buildIntroMessages(profile)
@@ -39,6 +45,12 @@ export function ChatPlayground({ profile, onReset }: ChatPlaygroundProps) {
   const [lastError, setLastError] = useState<string | null>(null);
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [detectedMood, setDetectedMood] = useState<string | null>(null);
+  const { entries: journalEntries, addEntry: addMoodEntry } = useMoodJournal(
+    profileId
+  );
+  const [journalMood, setJournalMood] = useState<MoodTag>("tenang");
+  const [journalNote, setJournalNote] = useState("");
+  const [journalMessage, setJournalMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setMessages(buildIntroMessages(profile));
@@ -86,6 +98,7 @@ export function ChatPlayground({ profile, onReset }: ChatPlaygroundProps) {
       })),
       profile,
       detectedMood,
+      profileId: profileId ?? undefined,
     };
 
     try {
@@ -128,6 +141,13 @@ export function ChatPlayground({ profile, onReset }: ChatPlaygroundProps) {
       event.preventDefault();
       handleSend();
     }
+  };
+
+  const handleJournalSave = () => {
+    addMoodEntry({ mood: journalMood, note: journalNote });
+    setJournalMessage("Terima kasih sudah refleksi, catatanmu tersimpan 🌈");
+    setJournalNote("");
+    setTimeout(() => setJournalMessage(null), 2500);
   };
 
   return (
@@ -247,6 +267,15 @@ export function ChatPlayground({ profile, onReset }: ChatPlaygroundProps) {
               {lastError} Coba lagi sebentar ya 💛
             </p>
           )}
+          <MoodJournalCard
+            entries={journalEntries}
+            mood={journalMood}
+            note={journalNote}
+            onMoodChange={setJournalMood}
+            onNoteChange={setJournalNote}
+            onSave={handleJournalSave}
+            feedback={journalMessage}
+          />
         </div>
       </div>
     </section>
@@ -304,5 +333,95 @@ function EmotionSection({
       onToggle={onToggle}
       onMoodChange={onMoodChange}
     />
+  );
+}
+
+type MoodJournalCardProps = {
+  entries: MoodEntry[];
+  mood: MoodTag;
+  note: string;
+  onMoodChange: (value: MoodTag) => void;
+  onNoteChange: (value: string) => void;
+  onSave: () => void;
+  feedback: string | null;
+};
+
+const moodOptions: Array<{ label: string; value: MoodTag; emoji: string }> = [
+  { label: "Tenang", value: "tenang", emoji: "🌤️" },
+  { label: "Ceria", value: "ceria", emoji: "🌈" },
+  { label: "Lelah", value: "lelah", emoji: "😴" },
+  { label: "Cemas", value: "cemas", emoji: "😰" },
+  { label: "Sedih", value: "sedih", emoji: "🌧️" },
+];
+
+function MoodJournalCard({
+  entries,
+  mood,
+  note,
+  onMoodChange,
+  onNoteChange,
+  onSave,
+  feedback,
+}: MoodJournalCardProps) {
+  return (
+    <div className="rounded-3xl border border-white/15 bg-white/8 p-4 text-sm text-white/80">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="font-semibold text-white/90">
+          Catat mood kamu barusan ✍️
+        </p>
+        {feedback && (
+          <span className="text-xs text-emerald-200">{feedback}</span>
+        )}
+      </div>
+      <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <select
+          value={mood}
+          onChange={(event) =>
+            onMoodChange(event.target.value as MoodTag)
+          }
+          className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white/90 focus:border-white/40 focus:outline-none"
+        >
+          {moodOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.emoji} {option.label}
+            </option>
+          ))}
+        </select>
+        <input
+          value={note}
+          onChange={(event) => onNoteChange(event.target.value)}
+          placeholder="Catatan singkat (opsional)"
+          className="flex-1 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white/85 placeholder:text-white/45 focus:border-white/40 focus:outline-none"
+        />
+        <button
+          type="button"
+          onClick={onSave}
+          className="inline-flex items-center rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-[#5c4bff] transition-transform hover:-translate-y-0.5"
+        >
+          Simpan mood
+        </button>
+      </div>
+      {entries.length > 0 && (
+        <ul className="mt-3 space-y-2 text-xs text-white/60">
+          {entries.slice(0, 4).map((entry) => (
+            <li
+              key={entry.id}
+              className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-3 py-2"
+            >
+              <span>
+                {moodOptions.find((o) => o.value === entry.mood)?.emoji}{" "}
+                {entry.mood}
+              </span>
+              <span>
+                {new Date(entry.timestamp).toLocaleString("id-ID", {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                })}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
