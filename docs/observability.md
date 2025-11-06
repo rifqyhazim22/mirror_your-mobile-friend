@@ -24,5 +24,5 @@
 
 ## Compliance
 - Retensi data: PaymentSession + log harus disimpan minimal 1 tahun untuk audit (tentative).
-- Audit trail: tangkap perubahan status premium, payment, dan consent (TODO modul audit log).
+- Audit trail: sekarang audit log merekam aktivasi premium dan perubahan consent (action `premium_activated`, `consent_updated`). Rencanakan tampilan dashboard audit + retensi 12 bulan.
 - Incident response: definisikan playbook (lihat backlog Langkah 5).

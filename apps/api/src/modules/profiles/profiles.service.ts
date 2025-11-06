@@ -8,6 +8,7 @@ import {
 } from "./dto/create-profile.dto";
 import { PrismaService } from "../../prisma/prisma.service";
 import { CreateMoodEntryDto } from "./dto/create-mood-entry.dto";
+import { requestContext } from "../../common/logger/request-context.service";
 
 @Injectable()
 export class ProfilesService {
@@ -53,7 +54,15 @@ export class ProfilesService {
 
   async update(id: string, ownerId: string, payload: CreateProfileDto) {
     await this.ensureOwnership(id, ownerId);
-    return this.prisma.profile.update({
+    const before = await this.prisma.profile.findUnique({
+      where: { id },
+      select: {
+        consentCamera: true,
+        consentData: true,
+      },
+    });
+
+    const updated = await this.prisma.profile.update({
       where: { id },
       data: {
         nickname: payload.nickname.trim(),
@@ -69,6 +78,8 @@ export class ProfilesService {
         personalityNotes: payload.personalityNotes?.trim() || null,
       },
     });
+    await this.captureConsentAuditLogs(id, ownerId, before, updated);
+    return updated;
   }
 
   async addMoodEntry(
@@ -170,6 +181,35 @@ export class ProfilesService {
     if (profile.ownerId !== ownerId) {
       throw new ForbiddenException();
     }
+  }
+
+  private async captureConsentAuditLogs(
+    profileId: string,
+    ownerId: string,
+    before?: { consentCamera: boolean; consentData: boolean } | null,
+    after?: { consentCamera: boolean; consentData: boolean } | null,
+  ) {
+    if (!before || !after) return;
+    const changes: Record<string, { from: boolean; to: boolean }> = {};
+    if (before.consentCamera !== after.consentCamera) {
+      changes.consentCamera = { from: before.consentCamera, to: after.consentCamera };
+    }
+    if (before.consentData !== after.consentData) {
+      changes.consentData = { from: before.consentData, to: after.consentData };
+    }
+    if (Object.keys(changes).length === 0) return;
+
+    await this.prisma.auditLog.create({
+      data: {
+        ownerId,
+        profileId,
+        actorId: requestContext.userId ?? ownerId,
+        action: "consent_updated",
+        entityType: "Profile",
+        entityId: profileId,
+        changes,
+      },
+    });
   }
 }
 
