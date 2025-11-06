@@ -20,6 +20,7 @@
 - Integrasi Sentry untuk NestJS (dsn environment) + menambah log error kritis.
 - Tambahkan health endpoint (`/v1/health`) mengembalikan status database/queue.
 - Konfigurasi metric agent (Prometheus/OpenTelemetry) untuk memonitor latency & failure rate.
+- Tambah audit log: sudah ada tabel `AuditLog` dengan action `premium_activated`; perlu diperluas untuk consent & payment lainnya.
 
 ## Compliance
 - Retensi data: PaymentSession + log harus disimpan minimal 1 tahun untuk audit (tentative).

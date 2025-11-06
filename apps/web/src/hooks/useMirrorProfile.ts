@@ -252,6 +252,9 @@ export function useMirrorProfile(
         primaryArchetype: profile.primaryArchetype,
         zodiacSign: profile.zodiacSign,
         personalityNotes: profile.personalityNotes?.trim() || null,
+        premiumPlanId: profile.premiumPlanId,
+        premiumStatus: profile.premiumStatus,
+        premiumActiveSince: profile.premiumActiveSince,
       };
 
       const response = await fetch(endpoint, {

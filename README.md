@@ -68,6 +68,7 @@ API sementara:
 - `GET /v1/payments/sessions` – riwayat pembayaran mock (disimpan di Prisma).
 - `POST /v1/payments/sessions/:id/mark-paid` – helper untuk menandai sesi sebagai paid saat testing.
 - Endpoint Next.js `/api/mirror-chat` (AI playground) tetap tanpa auth untuk saat ini.
+- `GET /v1/health` – health check sederhana (status + timestamp).
 
 ### Database & Prisma
 - Prisma mengarah ke Postgres melalui `DATABASE_URL` (contoh: `postgresql://postgres:postgres@localhost:5432/mirror?schema=public`).
