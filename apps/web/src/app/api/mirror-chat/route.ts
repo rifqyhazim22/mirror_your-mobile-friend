@@ -1,5 +1,10 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
+import {
+  evaluateSafetyPolicies,
+  type SafetyEvaluation,
+} from "@/lib/safety-policies";
+import { logGuardrailEvent } from "@/lib/guardrail-logger";
 
 const openaiKey = process.env.OPENAI_API_KEY;
 const openai = openaiKey ? new OpenAI({ apiKey: openaiKey }) : null;
@@ -12,6 +17,12 @@ type MirrorProfilePayload = {
   consentCamera?: boolean;
   consentData?: boolean;
   moodBaseline?: string;
+  birthDate?: string | null;
+  zodiacSign?: string | null;
+  mbtiType?: string | null;
+  enneagramType?: string | null;
+  primaryArchetype?: string | null;
+  personalityNotes?: string | null;
 };
 
 type ChatPayload = {
@@ -53,11 +64,25 @@ export async function POST(request: Request) {
     .find((message) => message.role === "user");
 
   if (latestUserMessage?.content) {
+    const policyEvaluation = evaluateSafetyPolicies(latestUserMessage.content);
+    const guardedResponse = await handlePolicyEvaluation(
+      policyEvaluation,
+      latestUserMessage.content,
+      profile
+    );
+    if (guardedResponse) {
+      return guardedResponse;
+    }
+
     const flagged = await runModeration(latestUserMessage.content);
     if (flagged) {
       return NextResponse.json({
         message:
           "Terima kasih sudah cerita. Aku khawatir kamu sedang dalam kondisi yang perlu bantuan profesional. Coba hubungi hotline darurat atau orang terpercaya ya 💛",
+        meta: {
+          action: "escalate",
+          reason: "openai-moderation-flag",
+        },
       });
     }
   }
@@ -86,7 +111,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: FALLBACK_RESPONSE });
     }
 
-    return NextResponse.json({ message: text });
+    return NextResponse.json({ message: text, meta: { action: "allow" } });
   } catch (error: any) {
     console.error("Mirror chat error", error);
     const status = error?.status ?? 500;
@@ -111,12 +136,39 @@ function buildPersonaSummary(
   const mood = detectedMood
     ? `Saat ini aku melihat ekspresinya cenderung ${detectedMood}.`
     : "Bantu cek suasana hati pengguna berdasarkan cerita dan validasi perasaan mereka.";
+  const traitPieces = [
+    profile?.mbtiType ? `tipe MBTI ${profile.mbtiType}` : null,
+    profile?.enneagramType ? `Enneagram ${profile.enneagramType}` : null,
+    profile?.primaryArchetype
+      ? `archetype ${formatHumanReadable(profile.primaryArchetype)}`
+      : null,
+    profile?.zodiacSign ? `zodiak ${formatHumanReadable(profile.zodiacSign)}` : null,
+  ].filter(Boolean);
+  const traitLine = traitPieces.length
+    ? `Profil psikologi mereka meliputi ${traitPieces.join(", ")}.`
+    : "Belum ada data kepribadian lengkap, jadi gali preferensi mereka dengan pertanyaan lembut.";
+  const baselineLine = profile?.moodBaseline
+    ? `Mood baseline mereka cenderung ${profile.moodBaseline}. Sesuaikan energi respon dengan ritme itu.`
+    : "Tanyakan level energi dan mood baseline sebelum memberi saran mendalam.";
+  const notesLine = profile?.personalityNotes
+    ? `Catatan khusus dari sesi onboarding: ${profile.personalityNotes}.`
+    : "";
 
   return `Kamu adalah Mirror, teman curhat AI berbasis empati untuk Gen Z di Indonesia. 
 Gunakan bahasa santai, hangat, penuh emotikon seperlunya, dan tetap ilmiah ringan.
 Selalu eksplisitkan empati, validasi emosi, dan tawarkan langkah kecil praktis.
 Sesuaikan gaya dengan ${nickname} yang fokus pada ${focus}. ${mood}
+${traitLine}
+${baselineLine}
+${notesLine}
 Jika percakapan mengandung indikasi bahaya, sarankan bantuan profesional dan hotline darurat.`;
+}
+
+function formatHumanReadable(value: string) {
+  return value
+    .split(/[\s_-]+/)
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
 }
 
 async function runModeration(content: string) {
@@ -131,4 +183,49 @@ async function runModeration(content: string) {
     console.warn("Moderation check gagal", error);
     return false;
   }
+}
+
+async function handlePolicyEvaluation(
+  evaluation: SafetyEvaluation,
+  userText: string,
+  profile?: MirrorProfilePayload
+) {
+  if (evaluation.action === "allow") {
+    return null;
+  }
+
+  const basePayload = {
+    ruleId: evaluation.triggeredRule?.id,
+    action: evaluation.action,
+    message: evaluation.triggeredRule?.description ?? "",
+    userText,
+    metadata: {
+      profileNickname: profile?.nickname ?? null,
+      focusAreas: profile?.focusAreas ?? [],
+    },
+  };
+
+  await logGuardrailEvent(basePayload);
+
+  if (evaluation.action === "warn") {
+    return NextResponse.json({
+      message:
+        "Aku denger kamu lagi ngalamin situasi berat. Aku bakal jawab dengan ekstra hati-hati ya, dan kalau butuh manusia, kabari aku ❤️",
+      meta: {
+        action: "warn",
+        ruleId: evaluation.triggeredRule?.id,
+        guidance: evaluation.triggeredRule?.guidance ?? "",
+      },
+    });
+  }
+
+  return NextResponse.json({
+    message:
+      "Terima kasih sudah cerita. Aku akan sambungkan kamu ke tim support manusia Mirror supaya kamu bisa dapat bantuan yang aman dan tepat. Tetap di sini ya 💛",
+    meta: {
+      action: "escalate",
+      ruleId: evaluation.triggeredRule?.id,
+      guidance: evaluation.triggeredRule?.guidance ?? "",
+    },
+  });
 }

@@ -22,6 +22,12 @@ model Profile {
   consentCamera Boolean
   consentData   Boolean
   moodBaseline  String
+  birthDate     DateTime?
+  mbtiType      String?
+  enneagramType String?
+  primaryArchetype String?
+  zodiacSign    String?
+  personalityNotes String?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   moodEntries   MoodEntry[]
@@ -35,6 +41,7 @@ model MoodEntry {
   profileId String
   mood      String
   note      String?
+  source    String   @default("manual")
   createdAt DateTime @default(now())
 
   @@index([profileId])

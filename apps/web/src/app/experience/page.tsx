@@ -5,15 +5,23 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
+  CalendarDays,
   Camera,
   Check,
   Compass,
   PartyPopper,
   ShieldCheck,
   Sparkles,
+  WandSparkles,
 } from "lucide-react";
 import { ChatPlayground } from "@/components/chat-playground";
-import { useMirrorProfile } from "@/hooks/useMirrorProfile";
+import {
+  ArchetypeKey,
+  EnneagramType,
+  MbtiType,
+  ZodiacSign,
+  useMirrorProfile,
+} from "@/hooks/useMirrorProfile";
 import { useMirrorSession } from "@/hooks/useMirrorSession";
 
 const focusCatalog = [
@@ -43,9 +51,89 @@ const focusCatalog = [
   }
 ] as const;
 
-type StepKey = "greeting" | "focus" | "consent";
+const moodBaselineCatalog = [
+  {
+    id: "tenang",
+    label: "Tenang stabil",
+    emoji: "🌤️",
+    blurb: "Butuh ruang aman untuk cerita dan refleksi pelan-pelan."
+  },
+  {
+    id: "bersemangat",
+    label: "Bersemangat",
+    emoji: "⚡️",
+    blurb: "Suka eksplor ide dan aksi cepat tapi perlu grounding."
+  },
+  {
+    id: "lelah",
+    label: "Sering lelah",
+    emoji: "🌧️",
+    blurb: "Energi cepat turun, butuh dukungan lembut dan ritme teratur."
+  }
+] as const;
 
-const orderedSteps: StepKey[] = ["greeting", "focus", "consent"];
+const mbtiCatalog: Array<{ code: MbtiType; name: string; spark: string }> = [
+  { code: "INFJ", name: "Advocate", spark: "Empatik & penuh makna" },
+  { code: "INFP", name: "Mediator", spark: "Imaginatif & idealis" },
+  { code: "ENFJ", name: "Protagonist", spark: "Leader hangat & suportif" },
+  { code: "ENFP", name: "Campaigner", spark: "Optimis, spontan, inspiratif" },
+  { code: "INTJ", name: "Architect", spark: "Visioner & strategis" },
+  { code: "INTP", name: "Logician", spark: "Analitis & rasa ingin tahu tinggi" },
+  { code: "ENTJ", name: "Commander", spark: "Tegas, terstruktur, ambisius" },
+  { code: "ENTP", name: "Debater", spark: "Eksplor ide liar, suka tantangan" },
+  { code: "ISTJ", name: "Logistician", spark: "Konsisten & pragmatis" },
+  { code: "ISFJ", name: "Defender", spark: "Protektif, penuh perhatian" },
+  { code: "ESTJ", name: "Executive", spark: "Organisator ulung" },
+  { code: "ESFJ", name: "Consul", spark: "Harmonis & peduli relasi" },
+  { code: "ISTP", name: "Virtuoso", spark: "Taktis & gemar eksperimen" },
+  { code: "ISFP", name: "Adventurer", spark: "Sensitif, ekspresif, chill" },
+  { code: "ESTP", name: "Entrepreneur", spark: "Action packed & solutif" },
+  { code: "ESFP", name: "Entertainer", spark: "Fun seeker, bawa vibes positif" }
+];
+
+const enneagramCatalog: Array<{ code: EnneagramType; title: string; spark: string }> = [
+  { code: "1", title: "The Reformer", spark: "Perfeksionis, peduli nilai" },
+  { code: "2", title: "The Helper", spark: "Hangat, suka membantu" },
+  { code: "3", title: "The Achiever", spark: "Ambisius, fokus pencapaian" },
+  { code: "4", title: "The Individualist", spark: "Autentik & emosional" },
+  { code: "5", title: "The Investigator", spark: "Observan & private" },
+  { code: "6", title: "The Loyalist", spark: "Setia, cari rasa aman" },
+  { code: "7", title: "The Enthusiast", spark: "Petualang, ingin semua dicoba" },
+  { code: "8", title: "The Challenger", spark: "Protektif, berani bersuara" },
+  { code: "9", title: "The Peacemaker", spark: "Tenang, cari harmoni" }
+];
+
+const archetypeCatalog: Array<{ id: ArchetypeKey; label: string; spark: string }> = [
+  { id: "caregiver", label: "Caregiver", spark: "Peluk paling hangat" },
+  { id: "creator", label: "Creator", spark: "Selalu punya ide baru" },
+  { id: "explorer", label: "Explorer", spark: "Penasaran & suka petualangan" },
+  { id: "hero", label: "Hero", spark: "Tahan banting, siap bantu" },
+  { id: "innocent", label: "Innocent", spark: "Optimis, lihat sisi baik" },
+  { id: "lover", label: "Lover", spark: "Peka hubungan & rasa nyaman" },
+  { id: "magician", label: "Magician", spark: "Transformasi & insight" },
+  { id: "rebel", label: "Rebel", spark: "Question everything" },
+  { id: "sage", label: "Sage", spark: "Bijak, suka refleksi" },
+  { id: "jester", label: "Jester", spark: "Bawa tawa & spontanitas" }
+];
+
+const zodiacCatalog: Array<{ id: ZodiacSign; label: string }> = [
+  { id: "aries", label: "Aries ♈︎" },
+  { id: "taurus", label: "Taurus ♉︎" },
+  { id: "gemini", label: "Gemini ♊︎" },
+  { id: "cancer", label: "Cancer ♋︎" },
+  { id: "leo", label: "Leo ♌︎" },
+  { id: "virgo", label: "Virgo ♍︎" },
+  { id: "libra", label: "Libra ♎︎" },
+  { id: "scorpio", label: "Scorpio ♏︎" },
+  { id: "sagittarius", label: "Sagittarius ♐︎" },
+  { id: "capricorn", label: "Capricorn ♑︎" },
+  { id: "aquarius", label: "Aquarius ♒︎" },
+  { id: "pisces", label: "Pisces ♓︎" }
+];
+
+type StepKey = "greeting" | "focus" | "personality" | "consent";
+
+const orderedSteps: StepKey[] = ["greeting", "focus", "personality", "consent"];
 
 export default function ExperiencePage() {
   const {
@@ -115,11 +203,22 @@ export default function ExperiencePage() {
     if (activeStep === "focus") {
       return profile.focusAreas.length === 0;
     }
+    if (activeStep === "personality") {
+      return !profile.mbtiType || !profile.enneagramType || !profile.moodBaseline;
+    }
     if (activeStep === "consent") {
       return !profile.consentData;
     }
     return false;
-  }, [activeStep, profile.nickname, profile.focusAreas, profile.consentData]);
+  }, [
+    activeStep,
+    profile.nickname,
+    profile.focusAreas,
+    profile.consentData,
+    profile.mbtiType,
+    profile.enneagramType,
+    profile.moodBaseline,
+  ]);
 
   if (!isAuthenticated) {
     return (
@@ -176,6 +275,14 @@ export default function ExperiencePage() {
             <ArrowLeft className="h-4 w-4" /> Kembali ke halaman utama
           </Link>
           <div className="flex items-center gap-3">
+            {mode === "chat" && (
+              <Link
+                href="/insights"
+                className="rounded-full border border-white/10 px-3 py-2 text-xs text-white/70 transition-colors hover:border-white/30 hover:bg-white/10"
+              >
+                Mood insight 📊
+              </Link>
+            )}
             {mode === "chat" && (
               <button
                 onClick={() => {
@@ -282,6 +389,209 @@ export default function ExperiencePage() {
                         );
                       })}
                     </div>
+                  </motion.div>
+                )}
+                {activeStep === "personality" && (
+                  <motion.div
+                    key="personality"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -15 }}
+                    transition={{ duration: 0.35 }}
+                    className="space-y-6"
+                  >
+                    <h2 className="text-3xl font-semibold text-gradient sm:text-4xl">
+                      Kenali vibe kamu dulu yuk 🌟
+                    </h2>
+                    <p className="text-sm text-white/75 sm:text-base">
+                      Insight ini bantu Mirror menyesuaikan tone, ritme, dan coping tools yang relevan buat kamu.
+                    </p>
+
+                    <section className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm text-white/70">
+                        <WandSparkles className="h-4 w-4 text-accent" />
+                        Mood baseline kamu belakangan ini?
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-3">
+                        {moodBaselineCatalog.map((item) => {
+                          const active = profile.moodBaseline === item.id;
+                          return (
+                            <button
+                              key={item.id}
+                              type="button"
+                              onClick={() => updateProfile({ moodBaseline: item.id })}
+                              className={`rounded-3xl border px-4 py-4 text-left transition-all ${
+                                active
+                                  ? "border-white/60 bg-white/20 text-white"
+                                  : "border-white/15 bg-white/8 text-white/80 hover:border-white/35 hover:bg-white/12"
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="text-lg">{item.emoji}</span>
+                                {active && <Check className="h-4 w-4 text-white" />}
+                              </div>
+                              <p className="mt-3 text-base font-semibold text-white/90">
+                                {item.label}
+                              </p>
+                              <p className="text-xs text-white/70">{item.blurb}</p>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </section>
+
+                    <section className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm text-white/70">
+                        <Sparkles className="h-4 w-4 text-accent" />
+                        Gaya berpikir ala MBTI kamu?
+                      </div>
+                      <div className="grid gap-3 md:grid-cols-2">
+                        {mbtiCatalog.map((item) => {
+                          const active = profile.mbtiType === item.code;
+                          return (
+                            <button
+                              key={item.code}
+                              type="button"
+                              onClick={() => updateProfile({ mbtiType: item.code })}
+                              className={`rounded-3xl border px-4 py-4 text-left transition-all ${
+                                active
+                                  ? "border-white/60 bg-white/20 text-white"
+                                  : "border-white/15 bg-white/8 text-white/80 hover:border-white/35 hover:bg-white/12"
+                              }`}
+                            >
+                              <div className="flex items-center justify-between text-sm text-white/70">
+                                <span>{item.name}</span>
+                                {active && <Check className="h-4 w-4 text-white" />}
+                              </div>
+                              <p className="mt-2 text-lg font-semibold text-white/90">
+                                {item.code}
+                              </p>
+                              <p className="text-xs text-white/70">{item.spark}</p>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </section>
+
+                    <section className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm text-white/70">
+                        <Sparkles className="h-4 w-4 text-rose-200" />
+                        Enneagram mana yang paling relate?
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {enneagramCatalog.map((item) => {
+                          const active = profile.enneagramType === item.code;
+                          return (
+                            <button
+                              key={item.code}
+                              type="button"
+                              onClick={() => updateProfile({ enneagramType: item.code })}
+                              className={`rounded-3xl border px-4 py-4 text-left transition-all ${
+                                active
+                                  ? "border-white/60 bg-white/20 text-white"
+                                  : "border-white/15 bg-white/8 text-white/80 hover:border-white/35 hover:bg-white/12"
+                              }`}
+                            >
+                              <div className="flex items-center justify-between text-sm text-white/70">
+                                <span>{item.title}</span>
+                                {active && <Check className="h-4 w-4 text-white" />}
+                              </div>
+                              <p className="mt-2 text-lg font-semibold text-white/90">
+                                Tipe {item.code}
+                              </p>
+                              <p className="text-xs text-white/70">{item.spark}</p>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </section>
+
+                    <section className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm text-white/70">
+                        <Sparkles className="h-4 w-4 text-sky-200" />
+                        Archetype Jungian yang menggambarkan kamu (opsional)
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {archetypeCatalog.map((item) => {
+                          const active = profile.primaryArchetype === item.id;
+                          return (
+                            <button
+                              key={item.id}
+                              type="button"
+                              onClick={() =>
+                                updateProfile({
+                                  primaryArchetype: active ? null : item.id,
+                                })
+                              }
+                              className={`rounded-3xl border px-4 py-4 text-left transition-all ${
+                                active
+                                  ? "border-white/60 bg-white/20 text-white"
+                                  : "border-white/15 bg-white/8 text-white/80 hover:border-white/35 hover:bg-white/12"
+                              }`}
+                            >
+                              <div className="flex items-center justify-between text-sm text-white/70">
+                                <span>{item.label}</span>
+                                {active && <Check className="h-4 w-4 text-white" />}
+                              </div>
+                              <p className="text-xs text-white/70">{item.spark}</p>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </section>
+
+                    <section className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                      <label className="flex flex-col gap-2 text-sm text-white/70">
+                        Tanggal lahirmu
+                        <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-4 py-3">
+                          <CalendarDays className="h-4 w-4 text-white/70" />
+                          <input
+                            type="date"
+                            className="flex-1 bg-transparent text-sm text-white/90 focus:outline-none"
+                            value={profile.birthDate ?? ""}
+                            onChange={(event) => {
+                              const value = event.target.value || null;
+                              const zodiac = computeZodiacSign(value);
+                              updateProfile({
+                                birthDate: value,
+                                zodiacSign: value ? zodiac ?? profile.zodiacSign ?? null : null,
+                              });
+                            }}
+                          />
+                        </div>
+                      </label>
+                      <label className="flex flex-col gap-2 text-sm text-white/70">
+                        Zodiak (buat sentuhan fun pop-culture)
+                        <select
+                          className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white/90 focus:border-white/40 focus:outline-none"
+                          value={profile.zodiacSign ?? ""}
+                          onChange={(event) =>
+                            updateProfile({
+                              zodiacSign: (event.target.value || null) as ZodiacSign | null,
+                            })
+                          }
+                        >
+                          <option value="">Pilih (opsional)</option>
+                          {zodiacCatalog.map((item) => (
+                            <option key={item.id} value={item.id}>
+                              {item.label}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="md:col-span-2 flex flex-col gap-2 text-sm text-white/70">
+                        Catatan khusus tentang kamu (opsional)
+                        <textarea
+                          rows={3}
+                          placeholder="Misal: lebih responsif kalau diajak journaling singkat, alergi topik tertentu, dsb."
+                          className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white/90 focus:border-white/40 focus:outline-none"
+                          value={profile.personalityNotes}
+                          onChange={(event) =>
+                            updateProfile({ personalityNotes: event.target.value })
+                          }
+                        />
+                      </label>
+                    </section>
                   </motion.div>
                 )}
                 {activeStep === "consent" && (
@@ -411,4 +721,50 @@ function ConsentCard({ icon, title, description, active, onToggle }: ConsentCard
       </span>
     </button>
   );
+}
+
+function computeZodiacSign(value: string | null): ZodiacSign | null {
+  if (!value) return null;
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  const month = date.getUTCMonth() + 1;
+  const day = date.getUTCDate();
+  const ranges: Array<{ sign: ZodiacSign; start: [number, number]; end: [number, number] }> = [
+    { sign: "capricorn", start: [12, 22], end: [1, 19] },
+    { sign: "aquarius", start: [1, 20], end: [2, 18] },
+    { sign: "pisces", start: [2, 19], end: [3, 20] },
+    { sign: "aries", start: [3, 21], end: [4, 19] },
+    { sign: "taurus", start: [4, 20], end: [5, 20] },
+    { sign: "gemini", start: [5, 21], end: [6, 20] },
+    { sign: "cancer", start: [6, 21], end: [7, 22] },
+    { sign: "leo", start: [7, 23], end: [8, 22] },
+    { sign: "virgo", start: [8, 23], end: [9, 22] },
+    { sign: "libra", start: [9, 23], end: [10, 22] },
+    { sign: "scorpio", start: [10, 23], end: [11, 21] },
+    { sign: "sagittarius", start: [11, 22], end: [12, 21] },
+  ];
+
+  for (const range of ranges) {
+    const { sign, start, end } = range;
+
+    if (start[0] === 12) {
+      if ((month === 12 && day >= start[1]) || (month === 1 && day <= end[1])) {
+        return sign;
+      }
+      continue;
+    }
+
+    const afterStart =
+      (month > start[0]) || (month === start[0] && day >= start[1]);
+    const beforeEnd =
+      (month < end[0]) || (month === end[0] && day <= end[1]);
+
+    if (afterStart && beforeEnd) {
+      return sign;
+    }
+  }
+
+  return "capricorn";
 }

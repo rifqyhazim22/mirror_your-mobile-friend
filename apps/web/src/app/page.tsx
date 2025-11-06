@@ -286,12 +286,20 @@ function HeroSection() {
           >
             Mulai curhat di web sekarang 💬
           </Link>
-          <Link
-            href="#platforms"
-            className="inline-flex w-full items-center justify-center rounded-full border border-white/25 px-6 py-3 text-sm font-medium text-white/85 transition-colors hover:border-white/45 hover:bg-white/10 sm:w-auto"
-          >
-            Lihat opsi mobile 📲
-          </Link>
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <Link
+              href="/subscribe"
+              className="inline-flex w-full items-center justify-center rounded-full border border-white/25 px-6 py-3 text-sm font-medium text-white/85 transition-transform hover:-translate-y-0.5 hover:border-white/45 hover:bg-white/10 sm:w-auto"
+            >
+              Lihat paket Mirror Premium 💎
+            </Link>
+            <Link
+              href="#platforms"
+              className="inline-flex w-full items-center justify-center rounded-full border border-white/25 px-6 py-3 text-sm font-medium text-white/85 transition-colors hover:border-white/45 hover:bg-white/10 sm:w-auto"
+            >
+              Lihat opsi mobile 📲
+            </Link>
+          </div>
         </div>
         <ul className="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-white/70 sm:text-sm">
           {heroHighlights.map((item) => (

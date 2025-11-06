@@ -6,8 +6,11 @@ Mirror adalah aplikasi teman curhat virtual berbasis AI yang berfokus pada dukun
 - Struktur monorepo pnpm + Turborepo dengan workspace `apps/web`, `apps/api`, `services/ai`, dan paket bersama.
 - Landing page Next.js bernuansa liquid-glass + emotikon empatik, siap sebagai PWA (next-pwa).
 - Halaman pengalaman `/experience` menghadirkan onboarding empatik multi-langkah + simulasi chat Mirror.
+- Onboarding kini mencatat vibe kepribadian (MBTI, Enneagram, archetype, mood baseline, zodiak) untuk mempersonalisasi percakapan dan prompt AI.
 - Chat playground sudah terhubung ke LLM OpenAI (`gpt-5.0-nano`). Radar emosi sementara berupa preview kamera manual (deteksi otomatis akan hadir kemudian).
-- Mini mood journal untuk mencatat suasana hati setelah sesi chat (disimpan lokal).
+- Mini mood journal tersinkron ke backend (manual & auto capture kamera) untuk mencatat suasana hati setelah sesi chat.
+- Mood Insight `/insights` siap memvisualisasikan kalender mood 21 hari, statistik cepat, dan rekomendasi self-care adaptif.
+- Halaman pricing `/subscribe` dengan flow checkout mock + endpoint `POST /v1/payments/checkout-session` untuk simulasi gateway.
 - Konfigurasi Capacitor (Android, iOS, Electron) untuk menghasilkan APK dan aplikasi desktop dari bundle Next.
 - Dokumentasi build lintas platform: `docs/install-android.md`, `docs/install-desktop.md`, `docs/install-pwa.md`.
 
@@ -16,7 +19,7 @@ Mirror adalah aplikasi teman curhat virtual berbasis AI yang berfokus pada dukun
 - `apps/api` – Kerangka NestJS untuk API utama (auth berbasis kode + profile endpoint in-memory + siap dikembangkan).
 - `services/ai` – FastAPI skeleton untuk orkestrasi AI/LLM.
 - `packages/ui` & `packages/config` – Paket bersama (design system & konfigurasi).
-- `docs/` – Arsitektur, roadmap, backlog, install guide lintas platform.
+- `docs/` – Arsitektur, roadmap, backlog, monetisasi (`docs/monetization.md`), install guide lintas platform.
 
 ## Perintah Penting
 ```bash
@@ -51,6 +54,8 @@ API sementara:
 - `PUT /v1/profiles/:id` – update profil (butuh Bearer token).
 - `GET /v1/profiles/:id` – ambil profil yang tersimpan (termasuk mood entries terbaru).
 - `POST /v1/profiles/:id/mood-entries` & `GET /v1/profiles/:id/mood-entries` – CRUD mood journal.
+- `GET /v1/payments/plans` – daftar paket langganan (mock).
+- `POST /v1/payments/checkout-session` – buat sesi checkout dummy untuk uji flow.
 - Endpoint Next.js `/api/mirror-chat` (AI playground) tetap tanpa auth untuk saat ini.
 
 ### Database & Prisma

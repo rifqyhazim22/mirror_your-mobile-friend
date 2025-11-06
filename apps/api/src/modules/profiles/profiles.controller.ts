@@ -44,4 +44,10 @@ export class ProfilesController {
     const owner = (req as Request & { user?: AuthPayload }).user;
     return this.profilesService.listMoodEntries(id, owner!.sub);
   }
+
+  @Get(":id/mood-entries/summary")
+  summarizeMoodEntries(@Req() req: Request, @Param("id") id: string) {
+    const owner = (req as Request & { user?: AuthPayload }).user;
+    return this.profilesService.summarizeMoodEntries(id, owner!.sub);
+  }
 }

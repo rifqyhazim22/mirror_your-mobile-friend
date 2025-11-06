@@ -21,7 +21,7 @@ Backlog berikut mengelompokkan pekerjaan MVP (Fase 1) menjadi _epic_ dan _user s
   - Outcome: UI onboarding (sapaan avatar, pengambilan nama panggilan, preferensi).
   - Dependensi: Design system, avatar assets.
   - Selesai bila: Usability test (5 pengguna) menunjukkan >80% memahami alur.
-- **B2. Tes MBTI & Enneagram Singkat** — TODO (belum ada kuis, baru fokus area onboarding).
+- **B2. Tes MBTI & Enneagram Singkat** — ✅ versi awal (pilihan manual di onboarding kepribadian).
   - Outcome: Kuis interaktif, scoring, penyimpanan hasil, penjelasan tipe.
   - Dependensi: Konten psikologi terkurasi.
   - Selesai bila: Hasil tersimpan ke profil, insight tampil di dashboard.
@@ -49,7 +49,7 @@ Backlog berikut mengelompokkan pekerjaan MVP (Fase 1) menjadi _epic_ dan _user s
   - Outcome: Face detection + expression classification (7 label) berjalan ≥15 FPS.
   - Dependensi: face-api.js model bundling, permission kamera.
   - Selesai bila: Benchmark di 3 laptop & 3 ponsel >80% akurasi dataset uji.
-- **D2. Sinkronisasi Mood** — in progress: mood journal tersimpan di DB via API.
+- **D2. Sinkronisasi Mood** ✅ mood journal manual + auto capture kamera tersimpan di backend, histori tampil di UI.
   - Outcome: Hasil emosi dikirim ke backend, disimpan, divisualisasi.
   - Dependensi: API emotion, charting library (Recharts/Victory).
   - Selesai bila: Dashboard menampilkan kalender mood interaktif.
@@ -63,6 +63,7 @@ Backlog berikut mengelompokkan pekerjaan MVP (Fase 1) menjadi _epic_ dan _user s
   - Outcome: Greeting adaptif, shortcut, progress ring.
   - Dependensi: Data mood, scheduler.
   - Selesai bila: Data real user muncul stabil pada staging.
+  - Catatan: Mood Insight `/insights` v1 sudah menampilkan kalender mood + rekomendasi adaptif.
 - **E2. Modul Konten**
   - Outcome: Kartu konten (artikel, latihan) dengan tag, filter.
   - Dependensi: Konten editorial, CMS headless (Contentful/Sanity) atau JSON seed.
@@ -85,5 +86,10 @@ Backlog berikut mengelompokkan pekerjaan MVP (Fase 1) menjadi _epic_ dan _user s
   - Outcome: Panduan incident response, playbook emergency, manual psikolog.
   - Dependensi: Input tim legal & psikologi.
   - Selesai bila: Dokumen ditandatangani pemangku kepentingan.
+
+## Epic G – Monetisasi & Distribusi
+- **G1. Pricing Page & Checkout Mock** ✅ `/subscribe` live + endpoint pembayaran mock untuk uji UX.
+- **G2. Payment Gateway Integration** — TODO: sambungkan ke Midtrans/Stripe, simpan status di DB.
+- **G3. Branding & Marketing Kit** — In-progress: draft `docs/monetization.md` memetakan aset & voice guideline.
 
 Backlog akan diperinci dalam papan kanban (_tracking tool_ TBD). Tiap cerita wajib memiliki kriteria uji, rencana keamanan, dan standar aksesibilitas (WCAG 2.2 AA) sebelum dianggap siap rilis.

@@ -2,12 +2,73 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+export type MbtiType =
+  | "INTJ"
+  | "INTP"
+  | "ENTJ"
+  | "ENTP"
+  | "INFJ"
+  | "INFP"
+  | "ENFJ"
+  | "ENFP"
+  | "ISTJ"
+  | "ISFJ"
+  | "ESTJ"
+  | "ESFJ"
+  | "ISTP"
+  | "ISFP"
+  | "ESTP"
+  | "ESFP";
+
+export type EnneagramType =
+  | "1"
+  | "2"
+  | "3"
+  | "4"
+  | "5"
+  | "6"
+  | "7"
+  | "8"
+  | "9";
+
+export type ArchetypeKey =
+  | "caregiver"
+  | "creator"
+  | "explorer"
+  | "hero"
+  | "innocent"
+  | "lover"
+  | "magician"
+  | "rebel"
+  | "sage"
+  | "jester";
+
+export type ZodiacSign =
+  | "aries"
+  | "taurus"
+  | "gemini"
+  | "cancer"
+  | "leo"
+  | "virgo"
+  | "libra"
+  | "scorpio"
+  | "sagittarius"
+  | "capricorn"
+  | "aquarius"
+  | "pisces";
+
 export type MirrorProfile = {
   nickname: string;
   focusAreas: string[];
   consentCamera: boolean;
   consentData: boolean;
   moodBaseline: "tenang" | "bersemangat" | "lelah";
+  birthDate: string | null;
+  zodiacSign: ZodiacSign | null;
+  mbtiType: MbtiType | null;
+  enneagramType: EnneagramType | null;
+  primaryArchetype: ArchetypeKey | null;
+  personalityNotes: string;
 };
 
 const STORAGE_KEY = "mirror-profile";
@@ -19,6 +80,12 @@ const defaultProfile: MirrorProfile = {
   consentCamera: false,
   consentData: false,
   moodBaseline: "tenang",
+  birthDate: null,
+  zodiacSign: null,
+  mbtiType: null,
+  enneagramType: null,
+  primaryArchetype: null,
+  personalityNotes: "",
 };
 
 export function useMirrorProfile(
@@ -87,7 +154,13 @@ export function useMirrorProfile(
           focusAreas: data.focusAreas,
           consentCamera: data.consentCamera,
           consentData: data.consentData,
-          moodBaseline: data.moodBaseline,
+          moodBaseline: (data.moodBaseline as MirrorProfile["moodBaseline"]) || "tenang",
+          birthDate: data.birthDate ? data.birthDate.slice(0, 10) : null,
+          zodiacSign: (data.zodiacSign ?? null) as MirrorProfile["zodiacSign"],
+          mbtiType: (data.mbtiType ?? null) as MirrorProfile["mbtiType"],
+          enneagramType: (data.enneagramType ?? null) as MirrorProfile["enneagramType"],
+          primaryArchetype: (data.primaryArchetype ?? null) as MirrorProfile["primaryArchetype"],
+          personalityNotes: data.personalityNotes ?? "",
         });
       } catch (error: any) {
         if (controller.signal.aborted) return;
@@ -139,7 +212,9 @@ export function useMirrorProfile(
     return (
       profile.nickname.trim().length >= 2 &&
       profile.focusAreas.length > 0 &&
-      profile.consentData
+      profile.consentData &&
+      Boolean(profile.mbtiType) &&
+      Boolean(profile.enneagramType)
     );
   }, [profile]);
 
@@ -162,7 +237,11 @@ export function useMirrorProfile(
           "Content-Type": "application/json",
           Authorization: `Bearer ${authToken}`,
         },
-        body: JSON.stringify(profile),
+        body: JSON.stringify({
+          ...profile,
+          birthDate: profile.birthDate || null,
+          personalityNotes: profile.personalityNotes?.trim() || null,
+        }),
       });
       if (!response.ok) {
         if (response.status === 401) {
@@ -177,7 +256,13 @@ export function useMirrorProfile(
         focusAreas: data.focusAreas,
         consentCamera: data.consentCamera,
         consentData: data.consentData,
-        moodBaseline: data.moodBaseline,
+        moodBaseline: (data.moodBaseline as MirrorProfile["moodBaseline"]) || "tenang",
+        birthDate: data.birthDate ? data.birthDate.slice(0, 10) : null,
+        zodiacSign: (data.zodiacSign ?? null) as MirrorProfile["zodiacSign"],
+        mbtiType: (data.mbtiType ?? null) as MirrorProfile["mbtiType"],
+        enneagramType: (data.enneagramType ?? null) as MirrorProfile["enneagramType"],
+        primaryArchetype: (data.primaryArchetype ?? null) as MirrorProfile["primaryArchetype"],
+        personalityNotes: data.personalityNotes ?? "",
       });
       if (!profileId) {
         setProfileId(data.id);

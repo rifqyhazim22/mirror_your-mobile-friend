@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export type MoodTag = "tenang" | "ceria" | "lelah" | "cemas" | "sedih";
+export type MoodEntrySource = "manual" | "camera" | "imported";
 
 export type MoodEntry = {
   id: string;
   timestamp: string;
   mood: MoodTag;
   note?: string | null;
+  source: MoodEntrySource;
 };
 
 type JournalStatus = "idle" | "loading" | "error";
@@ -51,8 +53,8 @@ export function useMoodJournal(
           }
           throw new Error("Gagal memuat mood journal");
         }
-        const data = (await response.json()) as MoodEntry[];
-        setEntries(data);
+        const payload = (await response.json()) as Array<Record<string, any>>;
+        setEntries(payload.map(normalizeMoodEntry));
         setStatus("idle");
         setError(null);
       } catch (err: any) {
@@ -67,7 +69,7 @@ export function useMoodJournal(
   }, [apiBase, profileId, authToken, onUnauthorized]);
 
   const addEntry = useCallback(
-    async (entry: { mood: MoodTag; note?: string }) => {
+    async (entry: { mood: MoodTag; note?: string; source?: MoodEntrySource }) => {
       if (!profileId || !authToken) {
         throw new Error("Profile belum tersimpan");
       }
@@ -82,6 +84,7 @@ export function useMoodJournal(
           body: JSON.stringify({
             mood: entry.mood,
             note: entry.note?.trim() || null,
+            source: entry.source ?? "manual",
           }),
         }
       );
@@ -91,7 +94,8 @@ export function useMoodJournal(
         }
         throw new Error("Gagal menyimpan mood entry");
       }
-      const created = (await response.json()) as MoodEntry;
+      const createdPayload = (await response.json()) as Record<string, any>;
+      const created = normalizeMoodEntry(createdPayload);
       setEntries((prev) => [created, ...prev].slice(0, 30));
       return created;
     },
@@ -103,5 +107,39 @@ export function useMoodJournal(
     status,
     error,
     addEntry,
+  };
+}
+
+const allowedMoodTags: MoodTag[] = ["tenang", "ceria", "lelah", "cemas", "sedih"];
+
+function normalizeMoodEntry(payload: Record<string, any>): MoodEntry {
+  const rawMood = typeof payload.mood === "string" ? payload.mood.toLowerCase() : "tenang";
+  const mood = allowedMoodTags.includes(rawMood as MoodTag)
+    ? (rawMood as MoodTag)
+    : "tenang";
+  const timestamp =
+    typeof payload.timestamp === "string"
+      ? payload.timestamp
+      : typeof payload.createdAt === "string"
+      ? payload.createdAt
+      : new Date().toISOString();
+  const source =
+    typeof payload.source === "string" && ["manual", "camera", "imported"].includes(payload.source)
+      ? (payload.source as MoodEntrySource)
+      : "manual";
+  return {
+    id:
+      typeof payload.id === "string"
+        ? payload.id
+        : typeof payload.id === "number"
+        ? String(payload.id)
+        : (typeof globalThis.crypto !== "undefined" &&
+            typeof globalThis.crypto.randomUUID === "function"
+            ? globalThis.crypto.randomUUID()
+            : `mood-${Math.random().toString(16).slice(2)}`),
+    timestamp,
+    mood,
+    note: typeof payload.note === "string" && payload.note.length > 0 ? payload.note : null,
+    source,
   };
 }
