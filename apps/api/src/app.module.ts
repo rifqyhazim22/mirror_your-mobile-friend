@@ -9,6 +9,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { StructuredLoggerInterceptor } from './common/logger/structured-logger.interceptor';
 import { HealthModule } from './health/health.module';
 import { MetricsModule } from './metrics/metrics.module';
+import { SentryInterceptor } from './common/sentry/sentry.interceptor';
 
 @Module({
   imports: [PrismaModule, AuthModule, ProfilesModule, PaymentsModule, HealthModule, MetricsModule],
@@ -18,6 +19,10 @@ import { MetricsModule } from './metrics/metrics.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: StructuredLoggerInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: SentryInterceptor,
     },
   ],
 })
