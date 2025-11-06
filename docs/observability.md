@@ -28,3 +28,23 @@
 - Metrics endpoint `/metrics` tersedia untuk Prometheus; histogram `http_server_duration_seconds` mencatat latency per method/route/status (scrape interval 15s disarankan).
 - Backend Sentry (opsional): set `SENTRY_DSN` dan `SENTRY_TRACES_SAMPLE_RATE` untuk mengirim error/trace dari API.
 - Incident response: definisikan playbook (lihat backlog Langkah 5 dan dokumen `docs/incident-response.md`).
+
+## Alerting & Pager
+- Rekomendasi setup:
+  1. Prometheus + Alertmanager
+     - Alert rules:
+       - `http_server_duration_seconds` 95th percentile > 2s selama 5 menit.
+       - `http_requests_total{status_code=~"5.."}` meningkat > 5/min.
+     - Kirim ke PagerDuty channel `mirror-oncall`.
+  2. Sentry Alerts
+     - Frontend: trigger untuk error rate > 3/min (environment production).
+     - Backend: trigger untuk exception `level=error`.
+- Semua alert harus disalurkan ke Incident Commander (`incident@mirror.dev`) dan on-call psikolog bila terkait safety.
+
+## Compliance Checklist (v0)
+- [x] Health check endpoint.
+- [x] Structured logging (JSON + requestId).
+- [x] Audit log untuk premium & consent.
+- [ ] Export & delete account flow (Langkah 6).
+- [ ] Data retention enforcement (cron cleanup).
+- [ ] Annual security review + pentest.
