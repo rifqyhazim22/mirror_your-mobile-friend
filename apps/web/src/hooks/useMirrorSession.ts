@@ -11,21 +11,32 @@ export function useMirrorSession() {
     const base = process.env.NEXT_PUBLIC_MIRROR_API_URL || "http://localhost:3001/v1";
     return base.replace(/\/$/, "");
   }, []);
+  const bypassAuth = process.env.NEXT_PUBLIC_AUTH_BYPASS === "true";
 
   const [token, setToken] = useState<string | null>(null);
   const [status, setStatus] = useState<AuthStatus>("idle");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (bypassAuth) {
+      setToken("bypass-token");
+      return;
+    }
     if (typeof window === "undefined") return;
     const stored = window.localStorage.getItem(TOKEN_KEY);
     if (stored) {
       setToken(stored);
     }
-  }, []);
+  }, [bypassAuth]);
 
   const login = useCallback(
     async (code: string) => {
+      if (bypassAuth) {
+        setToken("bypass-token");
+        setStatus("idle");
+        setError(null);
+        return;
+      }
       setStatus("loading");
       setError(null);
       try {
