@@ -284,6 +284,14 @@ export default function ExperiencePage() {
               </Link>
             )}
             {mode === "chat" && (
+              <Link
+                href="/premium"
+                className="rounded-full border border-white/10 px-3 py-2 text-xs text-white/70 transition-colors hover:border-white/30 hover:bg-white/10"
+              >
+                Premium hub 💎
+              </Link>
+            )}
+            {mode === "chat" && (
               <button
                 onClick={() => {
                   resetProfile();

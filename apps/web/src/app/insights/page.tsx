@@ -196,6 +196,36 @@ export default function InsightsPage() {
                 </div>
               </div>
             </div>
+            {profile.premiumStatus === "active" ? (
+              <div className="rounded-3xl border border-emerald-300/30 bg-emerald-300/10 p-6 text-sm text-emerald-100">
+                <h3 className="text-lg font-semibold text-white/90">Premium aktif 🎉</h3>
+                <p className="mt-2 text-white/80">
+                  Insight premium akan dikirim tiap minggu. Cek juga halaman Premium Hub untuk jadwal
+                  Mirror Connect dan konten coping eksklusif.
+                </p>
+                <Link
+                  href="/premium"
+                  className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/90 px-4 py-2 text-xs font-semibold text-[#5c4bff] transition-transform hover:-translate-y-0.5"
+                >
+                  Buka Premium Hub ✨
+                </Link>
+              </div>
+            ) : (
+              <div className="rounded-3xl border border-white/15 bg-white/8 p-6 text-sm text-white/75">
+                <h3 className="text-lg font-semibold text-white/90">Upgrade ke Mirror Premium</h3>
+                <p className="mt-2 text-white/70">
+                  Dapatkan insight mendalam, konten coping eksklusif, serta sesi Mirror Connect. Status kamu saat ini:{" "}
+                  <span className="text-white">{profile.premiumStatus}</span>.
+                </p>
+                <Link
+                  href="/subscribe"
+                  className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/90 px-4 py-2 text-xs font-semibold text-[#5c4bff] transition-transform hover:-translate-y-0.5"
+                >
+                  Lihat paket premium 💎
+                </Link>
+              </div>
+            )}
+
             <div className="glass-panel space-y-4 p-6">
               <h3 className="text-lg font-semibold text-white/90">Insight & Rekomendasi</h3>
               {summary ? (
