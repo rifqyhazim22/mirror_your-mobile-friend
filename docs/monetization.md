@@ -24,6 +24,9 @@ Dokumen ini memetakan langkah awal menuju monetisasi Mirror sambil menjaga keama
   - `MIDTRANS_SERVER_KEY` (server key)
   - `MIDTRANS_BASE_URL` (contoh sandbox: `https://app.sandbox.midtrans.com`)
   - `MIDTRANS_DEFAULT_AMOUNT` (opsional fallback nominal untuk plan mock)
+- Tambahkan webhook Midtrans (`POST /v1/payments/webhook/midtrans`):
+  - Set `MIDTRANS_CALLBACK_TOKEN` (opsional) untuk memvalidasi header `x-callback-token`.
+  - Next step: mapping order_id ↔ plan + user; saat status `capture/settlement` → tandai `paid`, jalankan onboarding premium.
 - Implement webhook Midtrans → endpoint `POST /v1/payments/webhook` (TODO) untuk menandai sesi `paid`.
 - Automasi onboarding premium (email + Mirror Connect) ketika status berubah `paid`.
 - Bundle upsell di halaman `/insights` saat data mood menunjukkan kebutuhan ekstra.

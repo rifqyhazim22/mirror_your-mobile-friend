@@ -140,4 +140,69 @@ export class PaymentsService {
   getProviderName() {
     return this.providerName;
   }
+
+  async handleMidtransNotification(payload: {
+    order_id?: string;
+    transaction_status?: string;
+    fraud_status?: string;
+  }) {
+    const reference = payload.order_id;
+    if (!reference) {
+      throw new BadRequestException("order_id tidak ditemukan");
+    }
+
+    const session = await this.prisma.paymentSession.findFirst({
+      where: { providerReference: reference },
+    });
+    if (!session) {
+      throw new NotFoundException("Session dengan reference tersebut tidak ditemukan");
+    }
+
+    const status = this.mapMidtransStatus(
+      payload.transaction_status,
+      payload.fraud_status,
+    );
+
+    if (!status) {
+      return { ignored: true };
+    }
+
+    const updated = await this.prisma.paymentSession.update({
+      where: { id: session.id },
+      data: {
+        status,
+        metadata: {
+          ...(session.metadata ?? {}),
+          lastMidtransStatus: payload.transaction_status,
+          lastMidtransFraudStatus: payload.fraud_status,
+        },
+      },
+    });
+
+    return {
+      id: updated.id,
+      status: updated.status,
+      providerReference: updated.providerReference,
+    };
+  }
+
+  private mapMidtransStatus(transactionStatus?: string, fraudStatus?: string) {
+    switch (transactionStatus) {
+      case "capture":
+        if (fraudStatus === "challenge") {
+          return "review";
+        }
+        return "paid";
+      case "settlement":
+        return "paid";
+      case "pending":
+        return "pending";
+      case "cancel":
+      case "deny":
+      case "expire":
+        return "failed";
+      default:
+        return null;
+    }
+  }
 }
