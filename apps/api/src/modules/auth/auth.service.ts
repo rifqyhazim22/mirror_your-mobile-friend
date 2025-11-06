@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 
 export interface AuthPayload {
   sub: string;
@@ -16,9 +16,10 @@ export class AuthService {
       throw new UnauthorizedException("Kode akses tidak valid.");
     }
     const payload: AuthPayload = { sub: "mirror-demo-user" };
-    const accessToken = jwt.sign(payload, this.jwtSecret, {
-      expiresIn: this.expiresIn,
-    });
+    const options: SignOptions = {
+      expiresIn: this.expiresIn as SignOptions["expiresIn"],
+    };
+    const accessToken = jwt.sign(payload, this.jwtSecret, options);
     return {
       accessToken,
       tokenType: "Bearer",

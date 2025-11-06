@@ -8,64 +8,100 @@ export type MoodEntry = {
   id: string;
   timestamp: string;
   mood: MoodTag;
-  note?: string;
+  note?: string | null;
 };
 
-const JOURNAL_STORAGE_KEY = "mirror-mood-journal";
+type JournalStatus = "idle" | "loading" | "error";
 
-function buildKey(profileId?: string | null) {
-  return profileId ? `${JOURNAL_STORAGE_KEY}:${profileId}` : JOURNAL_STORAGE_KEY;
-}
-
-export function useMoodJournal(profileId?: string | null) {
-  const storageKey = useMemo(() => buildKey(profileId), [profileId]);
-  const [entries, setEntries] = useState<MoodEntry[]>([]);
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const stored = window.localStorage.getItem(storageKey);
-      if (stored) {
-        const parsed = JSON.parse(stored) as MoodEntry[];
-        setEntries(parsed);
-      }
-    } catch (error) {
-      console.warn("Failed to load mood journal", error);
-    } finally {
-      setHydrated(true);
-    }
-  }, [storageKey]);
-
-  useEffect(() => {
-    if (!hydrated || typeof window === "undefined") return;
-    window.localStorage.setItem(storageKey, JSON.stringify(entries));
-  }, [entries, storageKey, hydrated]);
-
-  const addEntry = useCallback((entry: Omit<MoodEntry, "id" | "timestamp">) => {
-    const newEntry: MoodEntry = {
-      id:
-        typeof crypto !== "undefined" && crypto.randomUUID
-          ? crypto.randomUUID()
-          : Math.random().toString(36).slice(2),
-      timestamp: new Date().toISOString(),
-      mood: entry.mood,
-      note: entry.note?.trim() || undefined,
-    };
-    setEntries((prev) => [newEntry, ...prev].slice(0, 30));
-    return newEntry;
+export function useMoodJournal(
+  profileId?: string | null,
+  authToken?: string | null,
+  onUnauthorized?: () => void,
+) {
+  const apiBase = useMemo(() => {
+    const base = process.env.NEXT_PUBLIC_MIRROR_API_URL || "http://localhost:3001/v1";
+    return base.replace(/\/$/, "");
   }, []);
 
-  const clearAll = useCallback(() => {
-    setEntries([]);
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem(storageKey);
+  const [entries, setEntries] = useState<MoodEntry[]>([]);
+  const [status, setStatus] = useState<JournalStatus>("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!profileId || !authToken) {
+      setEntries([]);
+      return;
     }
-  }, [storageKey]);
+    const controller = new AbortController();
+    const load = async () => {
+      try {
+        setStatus("loading");
+        const response = await fetch(
+          `${apiBase}/profiles/${profileId}/mood-entries`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+            signal: controller.signal,
+          }
+        );
+        if (!response.ok) {
+          if (response.status === 401) {
+            onUnauthorized?.();
+          }
+          throw new Error("Gagal memuat mood journal");
+        }
+        const data = (await response.json()) as MoodEntry[];
+        setEntries(data);
+        setStatus("idle");
+        setError(null);
+      } catch (err: any) {
+        if (controller.signal.aborted) return;
+        console.warn(err);
+        setStatus("error");
+        setError(err?.message || "Gagal memuat mood journal");
+      }
+    };
+    load();
+    return () => controller.abort();
+  }, [apiBase, profileId, authToken, onUnauthorized]);
+
+  const addEntry = useCallback(
+    async (entry: { mood: MoodTag; note?: string }) => {
+      if (!profileId || !authToken) {
+        throw new Error("Profile belum tersimpan");
+      }
+      const response = await fetch(
+        `${apiBase}/profiles/${profileId}/mood-entries`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            mood: entry.mood,
+            note: entry.note?.trim() || null,
+          }),
+        }
+      );
+      if (!response.ok) {
+        if (response.status === 401) {
+          onUnauthorized?.();
+        }
+        throw new Error("Gagal menyimpan mood entry");
+      }
+      const created = (await response.json()) as MoodEntry;
+      setEntries((prev) => [created, ...prev].slice(0, 30));
+      return created;
+    },
+    [apiBase, profileId, authToken, onUnauthorized]
+  );
 
   return {
     entries,
+    status,
+    error,
     addEntry,
-    clearAll,
   };
 }

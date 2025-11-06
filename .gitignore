@@ -24,6 +24,9 @@ android/
 ios/
 electron/
 
+# Generated Prisma client
+apps/api/src/generated/
+
 # Python env
 venv/
 .venv/

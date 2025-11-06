@@ -190,6 +190,9 @@ export function useMirrorProfile(
     } catch (error: any) {
       console.error(error);
       setSyncStatus("error");
+      if (error?.status === 401 || error?.message === "Unauthenticated") {
+        onUnauthorized?.();
+      }
       throw error;
     }
   }, [apiBase, isComplete, profile, profileId, authToken, onUnauthorized]);

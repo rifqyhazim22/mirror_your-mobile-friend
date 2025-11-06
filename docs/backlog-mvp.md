@@ -7,7 +7,7 @@ Backlog berikut mengelompokkan pekerjaan MVP (Fase 1) menjadi _epic_ dan _user s
   - Outcome: Monorepo TurboRepo dengan workspace `apps/web`, `apps/api`, `services/ai`, `packages/*`.
   - Dependensi: Keputusan manajer paket (PNPM), konfigurasi lint/test.
   - Selesai bila: CI berjalan (lint, test dummy), _commit hooks_ aktif.
-- **A2. Infrastruktur Auth & Consent**
+- **A2. Infrastruktur Auth & Consent** — v0: kode akses beta + JWT sederhana (DONE); next: OAuth/consent versioning.
   - Outcome: Next Auth (OAuth Google/Apple + email/password), JWT mesin backend, consent versioning.
   - Dependensi: PostgreSQL skema awal.
   - Selesai bila: Pengguna bisa registrasi, login, mengubah consent toggle.
@@ -49,7 +49,7 @@ Backlog berikut mengelompokkan pekerjaan MVP (Fase 1) menjadi _epic_ dan _user s
   - Outcome: Face detection + expression classification (7 label) berjalan ≥15 FPS.
   - Dependensi: face-api.js model bundling, permission kamera.
   - Selesai bila: Benchmark di 3 laptop & 3 ponsel >80% akurasi dataset uji.
-- **D2. Sinkronisasi Mood**
+- **D2. Sinkronisasi Mood** — in progress: mood journal tersimpan di DB via API.
   - Outcome: Hasil emosi dikirim ke backend, disimpan, divisualisasi.
   - Dependensi: API emotion, charting library (Recharts/Victory).
   - Selesai bila: Dashboard menampilkan kalender mood interaktif.

@@ -33,10 +33,18 @@ type ChatMessage = {
 type ChatPlaygroundProps = {
   profile: MirrorProfile;
   profileId?: string | null;
+  authToken?: string | null;
+  onUnauthorized?: () => void;
   onReset: () => void;
 };
 
-export function ChatPlayground({ profile, profileId, onReset }: ChatPlaygroundProps) {
+export function ChatPlayground({
+  profile,
+  profileId,
+  authToken,
+  onUnauthorized,
+  onReset,
+}: ChatPlaygroundProps) {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>(() =>
     buildIntroMessages(profile)
@@ -45,9 +53,12 @@ export function ChatPlayground({ profile, profileId, onReset }: ChatPlaygroundPr
   const [lastError, setLastError] = useState<string | null>(null);
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [detectedMood, setDetectedMood] = useState<string | null>(null);
-  const { entries: journalEntries, addEntry: addMoodEntry } = useMoodJournal(
-    profileId
-  );
+  const {
+    entries: journalEntries,
+    status: journalStatus,
+    error: journalError,
+    addEntry: addMoodEntry,
+  } = useMoodJournal(profileId, authToken, onUnauthorized);
   const [journalMood, setJournalMood] = useState<MoodTag>("tenang");
   const [journalNote, setJournalNote] = useState("");
   const [journalMessage, setJournalMessage] = useState<string | null>(null);
@@ -143,11 +154,16 @@ export function ChatPlayground({ profile, profileId, onReset }: ChatPlaygroundPr
     }
   };
 
-  const handleJournalSave = () => {
-    addMoodEntry({ mood: journalMood, note: journalNote });
-    setJournalMessage("Terima kasih sudah refleksi, catatanmu tersimpan 🌈");
-    setJournalNote("");
-    setTimeout(() => setJournalMessage(null), 2500);
+  const handleJournalSave = async () => {
+    try {
+      await addMoodEntry({ mood: journalMood, note: journalNote });
+      setJournalMessage("Terima kasih sudah refleksi, catatanmu tersimpan 🌈");
+      setJournalNote("");
+    } catch (error: any) {
+      setJournalMessage(error?.message || "Gagal menyimpan mood");
+    } finally {
+      setTimeout(() => setJournalMessage(null), 2500);
+    }
   };
 
   return (
@@ -275,6 +291,8 @@ export function ChatPlayground({ profile, profileId, onReset }: ChatPlaygroundPr
             onNoteChange={setJournalNote}
             onSave={handleJournalSave}
             feedback={journalMessage}
+            status={journalStatus}
+            error={journalError}
           />
         </div>
       </div>
@@ -344,6 +362,8 @@ type MoodJournalCardProps = {
   onNoteChange: (value: string) => void;
   onSave: () => void;
   feedback: string | null;
+  status: "idle" | "loading" | "error";
+  error: string | null;
 };
 
 const moodOptions: Array<{ label: string; value: MoodTag; emoji: string }> = [
@@ -362,6 +382,8 @@ function MoodJournalCard({
   onNoteChange,
   onSave,
   feedback,
+  status,
+  error,
 }: MoodJournalCardProps) {
   return (
     <div className="rounded-3xl border border-white/15 bg-white/8 p-4 text-sm text-white/80">
@@ -369,8 +391,10 @@ function MoodJournalCard({
         <p className="font-semibold text-white/90">
           Catat mood kamu barusan ✍️
         </p>
-        {feedback && (
-          <span className="text-xs text-emerald-200">{feedback}</span>
+        {(feedback || error) && (
+          <span className={`text-xs ${error ? "text-rose-200" : "text-emerald-200"}`}>
+            {error || feedback}
+          </span>
         )}
       </div>
       <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -395,12 +419,13 @@ function MoodJournalCard({
         />
         <button
           type="button"
-          onClick={onSave}
-          className="inline-flex items-center rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-[#5c4bff] transition-transform hover:-translate-y-0.5"
-        >
-          Simpan mood
-        </button>
-      </div>
+              onClick={onSave}
+              disabled={status === "loading"}
+              className="inline-flex items-center rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-[#5c4bff] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {status === "loading" ? "Menyimpan..." : "Simpan mood"}
+            </button>
+          </div>
       {entries.length > 0 && (
         <ul className="mt-3 space-y-2 text-xs text-white/60">
           {entries.slice(0, 4).map((entry) => (

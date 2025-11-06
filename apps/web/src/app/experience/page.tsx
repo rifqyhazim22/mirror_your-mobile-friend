@@ -365,6 +365,8 @@ export default function ExperiencePage() {
           <ChatPlayground
             profile={profile}
             profileId={profileId}
+            authToken={token}
+            onUnauthorized={logout}
             onReset={() => {
               resetProfile();
               setMode("onboarding");

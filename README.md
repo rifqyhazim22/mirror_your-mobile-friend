@@ -47,9 +47,21 @@ API_PORT=3001 pnpm dev:api       # http://localhost:3001 (atau set di .env.local
 
 API sementara:
 - `POST /v1/auth/login` – login kode akses beta, menghasilkan JWT sederhana.
-- `POST /v1/profiles` – simpan hasil onboarding (disimpan in-memory, butuh Bearer token).
+- `POST /v1/profiles` – simpan hasil onboarding (butuh Bearer token).
 - `PUT /v1/profiles/:id` – update profil (butuh Bearer token).
-- `GET /v1/profiles/:id` – ambil profil yang tersimpan (butuh Bearer token).
+- `GET /v1/profiles/:id` – ambil profil yang tersimpan (termasuk mood entries terbaru).
+- `POST /v1/profiles/:id/mood-entries` & `GET /v1/profiles/:id/mood-entries` – CRUD mood journal.
+- Endpoint Next.js `/api/mirror-chat` (AI playground) tetap tanpa auth untuk saat ini.
+
+### Database & Prisma
+- Prisma mengarah ke Postgres melalui `DATABASE_URL` (contoh: `postgresql://postgres:postgres@localhost:5432/mirror?schema=public`).
+- Inisialisasi DB:
+  ```bash
+  cd apps/api
+  npx prisma migrate deploy        # atau gunakan migrate dev jika DB lokal siap
+  npx prisma generate
+  ```
+- Jika belum punya Postgres lokal, jalankan contoh Docker: `docker run --name mirror-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:16`.
 
 ## Deploy ke Vercel
 1. Pastikan sudah login Vercel: `npm i -g vercel` lalu `vercel login` (sekali).
@@ -65,7 +77,7 @@ API sementara:
    ```
 
 ## Next Steps
-1. Sambungkan profil + mood journal ke Postgres (via Prisma) dan tambahkan autentikasi pengguna sebenarnya.
+1. Tingkatkan autentikasi (multi-user OAuth) + persist percakapan dan peran psikolog di DB.
 2. Rancang insight mingguan otomatis & kalender mood, serta integrasi deteksi emosi sebenarnya.
 3. Tambahkan guardrail lanjutan (policy engine, audit logging, escalation flow) di backend & UI.
 4. Siapkan paket design system reusable + lint/test/CI lintas workspace.

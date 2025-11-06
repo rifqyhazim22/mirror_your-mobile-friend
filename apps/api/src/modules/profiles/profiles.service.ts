@@ -1,52 +1,86 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { randomUUID } from "crypto";
+import { Injectable, NotFoundException, ForbiddenException } from "@nestjs/common";
 import { CreateProfileDto } from "./dto/create-profile.dto";
-import { MirrorProfile } from "./profile.interface";
+import { PrismaService } from "../../prisma/prisma.service";
+import { CreateMoodEntryDto } from "./dto/create-mood-entry.dto";
 
 @Injectable()
 export class ProfilesService {
-  private readonly store = new Map<string, MirrorProfile>();
+  constructor(private readonly prisma: PrismaService) {}
 
-  create(payload: CreateProfileDto) {
-    const id = randomUUID();
-    const profile = this.mapPayloadToProfile(id, payload);
-    this.store.set(id, profile);
-    return profile;
+  async create(payload: CreateProfileDto, ownerId: string) {
+    return this.prisma.profile.create({
+      data: {
+        ownerId,
+        nickname: payload.nickname.trim(),
+        focusAreas: payload.focusAreas ?? [],
+        consentCamera: Boolean(payload.consentCamera),
+        consentData: Boolean(payload.consentData),
+        moodBaseline: payload.moodBaseline ?? "tenang",
+      },
+    });
   }
 
-  findOne(id: string) {
-    const profile = this.store.get(id);
+  async findOne(id: string, ownerId: string) {
+    const profile = await this.prisma.profile.findFirst({
+      where: { id, ownerId },
+      include: {
+        moodEntries: {
+          orderBy: { createdAt: "desc" },
+          take: 30,
+        },
+      },
+    });
     if (!profile) {
       throw new NotFoundException(`Profile ${id} tidak ditemukan`);
     }
     return profile;
   }
 
-  update(id: string, payload: CreateProfileDto) {
-    if (!this.store.has(id)) {
-      throw new NotFoundException(`Profile ${id} tidak ditemukan`);
-    }
-    const updated = this.mapPayloadToProfile(id, payload, this.store.get(id)!);
-    this.store.set(id, updated);
-    return updated;
+  async update(id: string, ownerId: string, payload: CreateProfileDto) {
+    await this.ensureOwnership(id, ownerId);
+    return this.prisma.profile.update({
+      where: { id },
+      data: {
+        nickname: payload.nickname.trim(),
+        focusAreas: payload.focusAreas ?? [],
+        consentCamera: Boolean(payload.consentCamera),
+        consentData: Boolean(payload.consentData),
+        moodBaseline: payload.moodBaseline ?? "tenang",
+      },
+    });
   }
 
-  private mapPayloadToProfile(
-    id: string,
-    payload: CreateProfileDto,
-    current?: MirrorProfile,
-  ): MirrorProfile {
-    return {
-      id,
-      nickname: (payload.nickname ?? current?.nickname ?? "").trim(),
-      focusAreas: Array.isArray(payload.focusAreas)
-        ? payload.focusAreas
-        : current?.focusAreas ?? [],
-      consentCamera:
-        payload.consentCamera ?? current?.consentCamera ?? false,
-      consentData: payload.consentData ?? current?.consentData ?? false,
-      moodBaseline: payload.moodBaseline ?? current?.moodBaseline ?? "tenang",
-      createdAt: current?.createdAt ?? new Date().toISOString(),
-    };
+  async addMoodEntry(
+    profileId: string,
+    ownerId: string,
+    payload: CreateMoodEntryDto,
+  ) {
+    await this.ensureOwnership(profileId, ownerId);
+    return this.prisma.moodEntry.create({
+      data: {
+        profileId,
+        mood: payload.mood,
+        note: payload.note?.trim() || null,
+      },
+    });
+  }
+
+  async listMoodEntries(profileId: string, ownerId: string) {
+    await this.ensureOwnership(profileId, ownerId);
+    return this.prisma.moodEntry.findMany({
+      where: { profileId },
+      orderBy: { createdAt: "desc" },
+      take: 30,
+    });
+  }
+
+  private async ensureOwnership(id: string, ownerId: string) {
+    const profile = await this.prisma.profile.findUnique({ where: { id } });
+    if (!profile) {
+      throw new NotFoundException(`Profile ${id} tidak ditemukan`);
+    }
+    if (profile.ownerId !== ownerId) {
+      throw new ForbiddenException();
+    }
   }
 }
