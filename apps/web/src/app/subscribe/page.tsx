@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -14,6 +14,7 @@ import { useMirrorSession } from "@/hooks/useMirrorSession";
 import { useMirrorProfile } from "@/hooks/useMirrorProfile";
 import { usePaymentSessions, type PaymentSession } from "@/hooks/usePaymentSessions";
 
+export const dynamic = "force-dynamic";
 const plans = [
   {
     id: "mirror-premium-monthly",

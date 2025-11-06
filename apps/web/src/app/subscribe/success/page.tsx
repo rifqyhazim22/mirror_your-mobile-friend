@@ -6,6 +6,8 @@ import { CheckCircle2, Sparkles, ArrowLeft, Loader2 } from "lucide-react";
 import { useMirrorSession } from "@/hooks/useMirrorSession";
 import { usePaymentSessions } from "@/hooks/usePaymentSessions";
 
+export const dynamic = "force-dynamic";
+
 const planCopy: Record<string, { title: string; message: string }> = {
   "mirror-premium-monthly": {
     title: "Mirror Premium Bulanan",
