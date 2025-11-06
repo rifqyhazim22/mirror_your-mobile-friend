@@ -37,13 +37,15 @@ pnpm run build:ios          # build web + sync ke proyek iOS
 - Duplikasi `.env.example` menjadi `.env.local` lalu isi:
   - `OPENAI_API_KEY` – OpenAI project key.
   - `API_PORT` (opsional) – port untuk NestJS lokal.
-  - `NEXT_PUBLIC_MIRROR_API_URL` – base URL API (contoh: `http://localhost:3001/v1`).
+- `NEXT_PUBLIC_MIRROR_API_URL` – base URL API (contoh: `http://localhost:3001/v1`).
 - `AUTH_SHARED_SECRET` – kode akses beta (diserahkan ke pengguna).
 - `AUTH_JWT_SECRET` – secret key untuk menandatangani JWT sederhana.
 - `PAYMENTS_PROVIDER` – `mock` (default) atau `midtrans`.
 - `MIDTRANS_SERVER_KEY` & `MIDTRANS_BASE_URL` – diisi ketika integrasi Midtrans aktif (opsional).
 - `PAYMENTS_ADMIN_SECRET` – secret untuk menandai sesi sebagai `paid` ketika memakai provider non-mock.
 - `MIDTRANS_DEFAULT_AMOUNT` – fallback gross amount (untuk testing sandbox) bila plan belum punya harga final.
+- `NEXT_PUBLIC_SENTRY_DSN` – optional DSN untuk mencatat error front-end dan tracing.
+- `NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE`, `NEXT_PUBLIC_SENTRY_REPLAY_SAMPLE_RATE`, `NEXT_PUBLIC_SENTRY_REPLAY_ERROR_SAMPLE_RATE` – konfigurasi sampling Sentry (default 0.1 / 0 / 0).
 - Saat deploy, set variabel yang sama di Vercel / platform yang kamu pakai.
 
 ## Development
