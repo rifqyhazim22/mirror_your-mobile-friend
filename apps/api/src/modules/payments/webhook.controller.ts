@@ -88,7 +88,7 @@ export class PaymentsWebhookController {
     if (!owner?.sub) {
       throw new BadRequestException("Unauthenticated");
     }
-    const result = await this.paymentsService.markPaid(sessionId, owner.sub);
+    const result = await this.paymentsService.markPaid(sessionId, owner.sub, undefined, owner.sub);
     return {
       ok: true,
       result,

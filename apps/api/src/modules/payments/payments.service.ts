@@ -110,7 +110,7 @@ export class PaymentsService {
     }));
   }
 
-  async markPaid(sessionId: string, ownerId: string, adminSecret?: string) {
+  async markPaid(sessionId: string, ownerId: string, adminSecret?: string, actorId?: string | null) {
     const session = await this.prisma.paymentSession.findUnique({ where: { id: sessionId } });
     if (!session || session.ownerId !== ownerId) {
       throw new NotFoundException("Payment session tidak ditemukan");
@@ -130,7 +130,7 @@ export class PaymentsService {
     });
 
     if (!alreadyPaid && updated.status === "paid") {
-      await this.activatePremiumForOwner(session.ownerId, session.planId);
+      await this.activatePremiumForOwner(session.ownerId, session.planId, session.id, actorId);
     }
 
     return {
@@ -186,7 +186,7 @@ export class PaymentsService {
     });
 
     if (status === "paid" && !wasPaid) {
-      await this.activatePremiumForOwner(session.ownerId, session.planId);
+      await this.activatePremiumForOwner(session.ownerId, session.planId, session.id);
     }
 
     return {
@@ -216,8 +216,13 @@ export class PaymentsService {
     }
   }
 
-  private async activatePremiumForOwner(ownerId: string, planId: string) {
-    await this.prisma.profile.updateMany({
+  private async activatePremiumForOwner(
+    ownerId: string,
+    planId: string,
+    paymentSessionId: string,
+    actorId?: string | null,
+  ) {
+    const result = await this.prisma.profile.updateMany({
       where: { ownerId },
       data: {
         premiumPlanId: planId,
@@ -225,5 +230,22 @@ export class PaymentsService {
         premiumActiveSince: new Date(),
       },
     });
+
+    if (result.count > 0) {
+      await this.prisma.auditLog.create({
+        data: {
+          ownerId,
+          profileId: null,
+          actorId: actorId ?? "system",
+          action: "premium_activated",
+          entityType: "PaymentSession",
+          entityId: paymentSessionId,
+          changes: {
+            premiumPlanId: planId,
+            premiumStatus: "active",
+          },
+        },
+      });
+    }
   }
 }

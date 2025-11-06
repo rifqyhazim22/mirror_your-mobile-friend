@@ -66,9 +66,28 @@ model PaymentSession {
   metadata  Json?
   provider  String  @default("mock")
   providerReference String?
+  auditLogs AuditLog[]
 
   profile   Profile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
 
   @@index([ownerId])
   @@index([profileId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  ownerId   String
+  profileId String?
+  actorId   String?
+  action    String
+  entityType String
+  entityId  String
+  changes   Json
+  createdAt DateTime @default(now())
+
+  profile   Profile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
+
+  @@index([ownerId])
+  @@index([profileId])
+  @@index([entityType, entityId])
 }

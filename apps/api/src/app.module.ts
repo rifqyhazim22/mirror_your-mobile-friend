@@ -7,9 +7,10 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { StructuredLoggerInterceptor } from './common/logger/structured-logger.interceptor';
+import { HealthModule } from './health/health.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, ProfilesModule, PaymentsModule],
+  imports: [PrismaModule, AuthModule, ProfilesModule, PaymentsModule, HealthModule],
   controllers: [AppController],
   providers: [
     AppService,
