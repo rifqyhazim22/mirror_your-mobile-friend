@@ -1,6 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import type { CreateSessionDto } from "./dto/create-session.dto";
+import {
+  resolvePaymentProvider,
+  type PaymentProviderSession,
+} from "./providers/payment.provider";
 
 export type PaymentSession = {
   id: string;
@@ -13,22 +17,38 @@ export type PaymentSession = {
 
 @Injectable()
 export class PaymentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly providerName: string;
+  private readonly provider: {
+    createCheckoutSession(
+      dto: CreateSessionDto,
+      context: { ownerId: string },
+    ): Promise<PaymentProviderSession>;
+  };
+
+  constructor(private readonly prisma: PrismaService) {
+    const resolved = resolvePaymentProvider();
+    this.provider = resolved.provider;
+    this.providerName = resolved.name;
+  }
 
   async createCheckoutSession(dto: CreateSessionDto, ownerId: string): Promise<PaymentSession> {
     const fakeAmount = dto.priceId === "mirror-premium-monthly" ? 499000 : 199000;
+    const providerSession = await this.provider.createCheckoutSession(dto, { ownerId });
     const created = await this.prisma.paymentSession.create({
       data: {
         ownerId,
         planId: dto.priceId,
         amount: fakeAmount,
         status: "ready",
-        checkoutUrl: `${dto.successUrl}?session=mock-${Date.now()}`,
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+        checkoutUrl: providerSession.checkoutUrl,
+        expiresAt: providerSession.expiresAt ?? null,
         currency: "IDR",
         metadata: {
-          isMock: true,
+          ...(providerSession.additionalMetadata ?? {}),
+          provider: this.providerName,
         },
+        provider: this.providerName,
+        providerReference: providerSession.providerReference ?? null,
       },
     });
 
@@ -85,13 +105,39 @@ export class PaymentsService {
       expiresAt: session.expiresAt?.toISOString() ?? null,
       createdAt: session.createdAt.toISOString(),
       metadata: session.metadata,
+      provider: session.provider,
+      providerReference: session.providerReference,
     }));
   }
 
-  async markPaid(sessionId: string, ownerId: string) {
-    return this.prisma.paymentSession.updateMany({
-      where: { id: sessionId, ownerId },
+  async markPaid(sessionId: string, ownerId: string, adminSecret?: string) {
+    const session = await this.prisma.paymentSession.findUnique({ where: { id: sessionId } });
+    if (!session || session.ownerId !== ownerId) {
+      throw new NotFoundException("Payment session tidak ditemukan");
+    }
+
+    if (session.provider !== "mock") {
+      const configuredSecret = process.env.PAYMENTS_ADMIN_SECRET;
+      if (!configuredSecret || configuredSecret !== adminSecret) {
+        throw new ForbiddenException("Mark paid hanya tersedia via webhook resmi");
+      }
+    }
+
+    const updated = await this.prisma.paymentSession.update({
+      where: { id: sessionId },
       data: { status: "paid" },
     });
+
+    return {
+      id: updated.id,
+      status: updated.status,
+      provider: updated.provider,
+      providerReference: updated.providerReference,
+      updatedAt: updated.updatedAt.toISOString(),
+    };
+  }
+
+  getProviderName() {
+    return this.providerName;
   }
 }

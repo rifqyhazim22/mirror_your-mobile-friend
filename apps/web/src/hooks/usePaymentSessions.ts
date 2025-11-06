@@ -12,6 +12,8 @@ export type PaymentSession = {
   createdAt: string;
   expiresAt?: string | null;
   metadata?: Record<string, unknown>;
+  provider?: string;
+  providerReference?: string | null;
 };
 
 type PaymentStatus = "idle" | "loading" | "error";
@@ -70,10 +72,38 @@ export function usePaymentSessions(
     void load();
   }, [load]);
 
+  const markPaid = useCallback(
+    async (sessionId: string, adminSecret?: string) => {
+      if (!authToken) {
+        throw new Error("Belum login");
+      }
+      const response = await fetch(`${apiBase}/payments/sessions/${sessionId}/mark-paid`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+          ...(adminSecret ? { "x-payments-admin-secret": adminSecret } : {}),
+        },
+        body: JSON.stringify({}),
+      });
+      if (!response.ok) {
+        if (response.status === 401) {
+          onUnauthorized?.();
+        }
+        const detail = await response.json().catch(() => ({}));
+        throw new Error(detail?.message || "Gagal menandai sesi sebagai selesai");
+      }
+      await load();
+      return response.json().catch(() => ({}));
+    },
+    [apiBase, authToken, load, onUnauthorized]
+  );
+
   return {
     sessions,
     status,
     error,
     refresh,
+    markPaid,
   };
 }

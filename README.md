@@ -38,8 +38,11 @@ pnpm run build:ios          # build web + sync ke proyek iOS
   - `OPENAI_API_KEY` – OpenAI project key.
   - `API_PORT` (opsional) – port untuk NestJS lokal.
   - `NEXT_PUBLIC_MIRROR_API_URL` – base URL API (contoh: `http://localhost:3001/v1`).
-  - `AUTH_SHARED_SECRET` – kode akses beta (diserahkan ke pengguna).
-  - `AUTH_JWT_SECRET` – secret key untuk menandatangani JWT sederhana.
+- `AUTH_SHARED_SECRET` – kode akses beta (diserahkan ke pengguna).
+- `AUTH_JWT_SECRET` – secret key untuk menandatangani JWT sederhana.
+- `PAYMENTS_PROVIDER` – `mock` (default) atau `midtrans`.
+- `MIDTRANS_SERVER_KEY` & `MIDTRANS_BASE_URL` – diisi ketika integrasi Midtrans aktif (opsional).
+- `PAYMENTS_ADMIN_SECRET` – secret untuk menandai sesi sebagai `paid` ketika memakai provider non-mock.
 - Saat deploy, set variabel yang sama di Vercel / platform yang kamu pakai.
 
 ## Development

@@ -28,8 +28,14 @@ export class PaymentsController {
   }
 
   @Post("sessions/:id/mark-paid")
-  markSessionPaid(@Req() req: Request, @Param("id") id: string) {
+  markSessionPaid(
+    @Req() req: Request,
+    @Param("id") id: string,
+    @Body("adminSecret") adminSecret?: string,
+  ) {
     const owner = (req as Request & { user?: AuthPayload }).user;
-    return this.paymentsService.markPaid(id, owner!.sub);
+    const headerSecret =
+      (req.headers["x-payments-admin-secret"] as string | undefined) ?? adminSecret;
+    return this.paymentsService.markPaid(id, owner!.sub, headerSecret);
   }
 }

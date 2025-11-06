@@ -61,6 +61,8 @@ model PaymentSession {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   metadata  Json?
+  provider  String  @default("mock")
+  providerReference String?
 
   profile   Profile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
 

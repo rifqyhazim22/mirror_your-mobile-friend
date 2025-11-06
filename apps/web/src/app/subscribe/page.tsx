@@ -75,11 +75,13 @@ export default function SubscribePage() {
     status: sessionStatus,
     error: sessionError,
     refresh: refreshSessions,
+    markPaid,
   } = usePaymentSessions(token, logout);
 
   const [processingPlan, setProcessingPlan] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [flowError, setFlowError] = useState<string | null>(null);
+  const [markingSessionId, setMarkingSessionId] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -262,6 +264,17 @@ export default function SubscribePage() {
             status={sessionStatus}
             error={sessionError}
             sessions={sessions}
+            onMarkPaid={async (sessionId) => {
+              try {
+                setMarkingSessionId(sessionId);
+                await markPaid(sessionId);
+              } catch (error: any) {
+                setCheckoutError(error?.message || "Gagal memperbarui status transaksi");
+              } finally {
+                setMarkingSessionId(null);
+              }
+            }}
+            markingId={markingSessionId}
           />
         </section>
 
@@ -288,10 +301,14 @@ function PaymentHistory({
   status,
   error,
   sessions,
+  onMarkPaid,
+  markingId,
 }: {
   status: "idle" | "loading" | "error";
   error: string | null;
   sessions: PaymentSession[];
+  onMarkPaid: (id: string) => Promise<void>;
+  markingId: string | null;
 }) {
   if (status === "loading") {
     return (
@@ -341,6 +358,22 @@ function PaymentHistory({
               )}
             </span>
           </div>
+          {session.provider === "mock" && session.status !== "paid" && (
+            <button
+              type="button"
+              onClick={() => onMarkPaid(session.id)}
+              className="mt-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs text-white/75 transition-colors hover:border-white/45 hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={markingId === session.id}
+            >
+              {markingId === session.id ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Menandai...
+                </>
+              ) : (
+                "Tandai selesai (mock)"
+              )}
+            </button>
+          )}
         </div>
       ))}
     </div>
