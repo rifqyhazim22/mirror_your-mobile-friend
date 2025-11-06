@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { ChatPlayground } from "@/components/chat-playground";
 import { useMirrorProfile } from "@/hooks/useMirrorProfile";
+import { useMirrorSession } from "@/hooks/useMirrorSession";
 
 const focusCatalog = [
   {
@@ -48,6 +49,14 @@ const orderedSteps: StepKey[] = ["greeting", "focus", "consent"];
 
 export default function ExperiencePage() {
   const {
+    token,
+    isAuthenticated,
+    status: authStatus,
+    error: authError,
+    login,
+    logout,
+  } = useMirrorSession();
+  const {
     profile,
     updateProfile,
     toggleFocusArea,
@@ -57,7 +66,9 @@ export default function ExperiencePage() {
     persistProfile,
     syncStatus,
     profileId,
-  } = useMirrorProfile();
+  } = useMirrorProfile(token, logout);
+  const [loginCode, setLoginCode] = useState("");
+  const [loginMessage, setLoginMessage] = useState<string | null>(null);
 
   const [stepIndex, setStepIndex] = useState(0);
   const [mode, setMode] = useState<"onboarding" | "chat">("onboarding");
@@ -110,6 +121,49 @@ export default function ExperiencePage() {
     return false;
   }, [activeStep, profile.nickname, profile.focusAreas, profile.consentData]);
 
+  if (!isAuthenticated) {
+    return (
+      <div className="relative min-h-screen bg-night pb-24">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_10%_20%,rgba(122,92,255,0.28),transparent_45%),radial-gradient(circle_at_90%_10%,rgba(255,115,194,0.32),transparent_55%)]" />
+        <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6 py-16 text-white">
+          <div className="glass-panel space-y-6 p-8">
+            <h1 className="text-3xl font-semibold text-gradient">Masuk dulu yuk ✨</h1>
+            <p className="text-sm text-white/75">
+              Gunakan kode akses beta untuk membuka Mirror Experience. Atur kode ini melalui variabel environment `AUTH_SHARED_SECRET` di backend NestJS.
+            </p>
+            <input
+              value={loginCode}
+              onChange={(event) => setLoginCode(event.target.value)}
+              placeholder="Masukkan kode akses"
+              className="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white/90 focus:border-white/40 focus:outline-none"
+              disabled={authStatus === "loading"}
+            />
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await login(loginCode.trim());
+                  setLoginCode("");
+                  setLoginMessage("Berhasil masuk, selamat datang! 💜");
+                  setTimeout(() => setLoginMessage(null), 2500);
+                } catch (error: any) {
+                  setLoginMessage(error?.message || "Kode akses salah");
+                }
+              }}
+              disabled={!loginCode.trim() || authStatus === "loading"}
+              className="inline-flex w-full items-center justify-center rounded-full bg-white/90 px-4 py-3 text-sm font-semibold text-[#5c4bff] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-white/40 disabled:text-[#867fff]"
+            >
+              {authStatus === "loading" ? "Sedang masuk..." : "Masuk ke Mirror"}
+            </button>
+            {(authError || loginMessage) && (
+              <p className="text-xs text-rose-200">{authError || loginMessage}</p>
+            )}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-screen bg-night pb-24">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_10%_20%,rgba(122,92,255,0.28),transparent_45%),radial-gradient(circle_at_90%_10%,rgba(255,115,194,0.32),transparent_55%)]" />
@@ -121,19 +175,38 @@ export default function ExperiencePage() {
           >
             <ArrowLeft className="h-4 w-4" /> Kembali ke halaman utama
           </Link>
-          {mode === "chat" && (
+          <div className="flex items-center gap-3">
+            {mode === "chat" && (
+              <button
+                onClick={() => {
+                  resetProfile();
+                  setStepIndex(0);
+                  setMode("onboarding");
+                }}
+                className="rounded-full border border-white/10 px-3 py-2 text-xs text-white/70 transition-colors hover:border-white/30 hover:bg-white/10"
+              >
+                Reset profil 🔄
+              </button>
+            )}
             <button
               onClick={() => {
+                logout();
                 resetProfile();
-                setStepIndex(0);
+                setAutoEntered(false);
                 setMode("onboarding");
               }}
               className="rounded-full border border-white/10 px-3 py-2 text-xs text-white/70 transition-colors hover:border-white/30 hover:bg-white/10"
             >
-              Reset profil 🔄
+              Keluar 🔒
             </button>
-          )}
+          </div>
         </nav>
+
+        {mode === "chat" && (
+          <div className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-center text-xs text-white/70">
+            Kamu terhubung sebagai pengguna beta. Jaga kode aksesmu baik-baik ya ✨
+          </div>
+        )}
 
         {mode === "onboarding" ? (
           <section className="glass-panel relative overflow-hidden p-8 sm:p-10">

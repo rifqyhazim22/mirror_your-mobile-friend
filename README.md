@@ -13,7 +13,7 @@ Mirror adalah aplikasi teman curhat virtual berbasis AI yang berfokus pada dukun
 
 ## Struktur Direktori
 - `apps/web` – Front-end Next.js (App Router, Tailwind v4, Framer Motion, PWA).
-- `apps/api` – Kerangka NestJS untuk API utama (profile endpoint in-memory + siap dikembangkan).
+- `apps/api` – Kerangka NestJS untuk API utama (auth berbasis kode + profile endpoint in-memory + siap dikembangkan).
 - `services/ai` – FastAPI skeleton untuk orkestrasi AI/LLM.
 - `packages/ui` & `packages/config` – Paket bersama (design system & konfigurasi).
 - `docs/` – Arsitektur, roadmap, backlog, install guide lintas platform.
@@ -35,6 +35,8 @@ pnpm run build:ios          # build web + sync ke proyek iOS
   - `OPENAI_API_KEY` – OpenAI project key.
   - `API_PORT` (opsional) – port untuk NestJS lokal.
   - `NEXT_PUBLIC_MIRROR_API_URL` – base URL API (contoh: `http://localhost:3001/v1`).
+  - `AUTH_SHARED_SECRET` – kode akses beta (diserahkan ke pengguna).
+  - `AUTH_JWT_SECRET` – secret key untuk menandatangani JWT sederhana.
 - Saat deploy, set variabel yang sama di Vercel / platform yang kamu pakai.
 
 ## Development
@@ -44,8 +46,10 @@ API_PORT=3001 pnpm dev:api       # http://localhost:3001 (atau set di .env.local
 ```
 
 API sementara:
-- `POST /v1/profiles` – simpan hasil onboarding (disimpan in-memory).
-- `GET /v1/profiles/:id` – ambil profil yang tersimpan.
+- `POST /v1/auth/login` – login kode akses beta, menghasilkan JWT sederhana.
+- `POST /v1/profiles` – simpan hasil onboarding (disimpan in-memory, butuh Bearer token).
+- `PUT /v1/profiles/:id` – update profil (butuh Bearer token).
+- `GET /v1/profiles/:id` – ambil profil yang tersimpan (butuh Bearer token).
 
 ## Deploy ke Vercel
 1. Pastikan sudah login Vercel: `npm i -g vercel` lalu `vercel login` (sekali).
@@ -61,9 +65,9 @@ API sementara:
    ```
 
 ## Next Steps
-1. Persistenkan data onboarding & percakapan ke storage (Postgres) melalui NestJS + tambah autentikasi dasar.
-2. Rancang modul jurnal mood + kalender insight yang sinkron dengan deteksi kamera.
-3. Tambahkan guardrail/ moderation layer (OpenAI safety + rules) dan logging audit.
+1. Sambungkan profil + mood journal ke Postgres (via Prisma) dan tambahkan autentikasi pengguna sebenarnya.
+2. Rancang insight mingguan otomatis & kalender mood, serta integrasi deteksi emosi sebenarnya.
+3. Tambahkan guardrail lanjutan (policy engine, audit logging, escalation flow) di backend & UI.
 4. Siapkan paket design system reusable + lint/test/CI lintas workspace.
 
 ## Referensi Konsep

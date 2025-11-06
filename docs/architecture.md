@@ -27,6 +27,7 @@ Dokumen ini merumuskan arsitektur awal untuk merealisasikan visi pada _Konsep Ap
   - GraphQL (Apollo) untuk query kompleks front-end + REST minimal untuk webhook/push.
   - Socket.IO adapter untuk event real-time (status psikolog, progress respon AI).
   - Prisma ORM untuk PostgreSQL, Mongoose atau Prisma Mongo untuk log chat.
+  - Modul Auth sementara: login berbasis kode akses beta → JWT sederhana untuk melindungi endpoint profil.
   - Modul `ProfilesModule` (sementara in-memory) menerima data onboarding dari Next.js.
 - **AI Orchestration (services/ai)**
   - FastAPI (Python) microservice menjalankan pipeline NLP & analitik:

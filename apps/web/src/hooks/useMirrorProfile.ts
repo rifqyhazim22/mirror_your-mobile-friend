@@ -21,13 +21,16 @@ const defaultProfile: MirrorProfile = {
   moodBaseline: "tenang",
 };
 
-export function useMirrorProfile() {
+export function useMirrorProfile(
+  authToken?: string | null,
+  onUnauthorized?: () => void
+) {
   const [profile, setProfile] = useState<MirrorProfile>(defaultProfile);
   const [hydrated, setHydrated] = useState(false);
   const [profileId, setProfileId] = useState<string | null>(null);
-  const [syncStatus, setSyncStatus] = useState<
-    "idle" | "loading" | "error"
-  >("idle");
+  const [syncStatus, setSyncStatus] = useState<"idle" | "loading" | "error">(
+    "idle"
+  );
   const apiBase =
     process.env.NEXT_PUBLIC_MIRROR_API_URL ?? "http://localhost:3001/v1";
 
@@ -56,7 +59,7 @@ export function useMirrorProfile() {
   }, [profile, hydrated]);
 
   useEffect(() => {
-    if (!profileId) {
+    if (!profileId || !authToken) {
       return;
     }
     const controller = new AbortController();
@@ -65,8 +68,15 @@ export function useMirrorProfile() {
         setSyncStatus("loading");
         const response = await fetch(`${apiBase}/profiles/${profileId}`, {
           signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
         });
         if (!response.ok) {
+          if (response.status === 401) {
+            onUnauthorized?.();
+            throw new Error("Unauthorized");
+          }
           throw new Error(`Failed to fetch profile ${profileId}`);
         }
         const data = (await response.json()) as MirrorProfile & {
@@ -79,13 +89,16 @@ export function useMirrorProfile() {
           consentData: data.consentData,
           moodBaseline: data.moodBaseline,
         });
-      } catch (error) {
+      } catch (error: any) {
         if (controller.signal.aborted) return;
         console.warn("Failed to load profile from API", error);
         if (typeof window !== "undefined") {
           window.localStorage.removeItem(PROFILE_ID_KEY);
         }
         setProfileId(null);
+        if (error?.message === "Unauthorized") {
+          onUnauthorized?.();
+        }
       } finally {
         if (!controller.signal.aborted) {
           setSyncStatus("idle");
@@ -94,7 +107,7 @@ export function useMirrorProfile() {
     };
     fetchProfile();
     return () => controller.abort();
-  }, [apiBase, profileId]);
+  }, [apiBase, profileId, authToken, onUnauthorized]);
 
   const updateProfile = useCallback(
     (update: Partial<MirrorProfile>) => {
@@ -136,6 +149,9 @@ export function useMirrorProfile() {
     }
     try {
       setSyncStatus("loading");
+      if (!authToken) {
+        throw new Error("Unauthenticated");
+      }
       const method = profileId ? "PUT" : "POST";
       const endpoint = profileId
         ? `${apiBase}/profiles/${profileId}`
@@ -144,10 +160,15 @@ export function useMirrorProfile() {
         method,
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify(profile),
       });
       if (!response.ok) {
+        if (response.status === 401) {
+          onUnauthorized?.();
+          throw Object.assign(new Error("Unauthorized"), { status: 401 });
+        }
         throw new Error("Gagal menyimpan profil");
       }
       const data = (await response.json()) as MirrorProfile & { id: string };
@@ -166,12 +187,12 @@ export function useMirrorProfile() {
       }
       setSyncStatus("idle");
       return data.id;
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       setSyncStatus("error");
       throw error;
     }
-  }, [apiBase, isComplete, profile, profileId]);
+  }, [apiBase, isComplete, profile, profileId, authToken, onUnauthorized]);
 
   return {
     profile,

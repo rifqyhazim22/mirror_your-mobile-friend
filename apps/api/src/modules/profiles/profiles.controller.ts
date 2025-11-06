@@ -1,7 +1,9 @@
-import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { CreateProfileDto } from "./dto/create-profile.dto";
 import { ProfilesService } from "./profiles.service";
+import { AuthGuard } from "../auth/auth.guard";
 
+@UseGuards(AuthGuard)
 @Controller({ path: "profiles", version: "1" })
 export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) {}
