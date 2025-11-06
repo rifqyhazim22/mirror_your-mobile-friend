@@ -46,6 +46,7 @@ pnpm run build:ios          # build web + sync ke proyek iOS
 - `MIDTRANS_DEFAULT_AMOUNT` – fallback gross amount (untuk testing sandbox) bila plan belum punya harga final.
 - `NEXT_PUBLIC_SENTRY_DSN` – optional DSN untuk mencatat error front-end dan tracing.
 - `NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE`, `NEXT_PUBLIC_SENTRY_REPLAY_SAMPLE_RATE`, `NEXT_PUBLIC_SENTRY_REPLAY_ERROR_SAMPLE_RATE` – konfigurasi sampling Sentry (default 0.1 / 0 / 0).
+- `SENTRY_DSN` – optional DSN untuk mencatat error backend (NestJS) bila Sentry server-side diaktifkan.
 - Saat deploy, set variabel yang sama di Vercel / platform yang kamu pakai.
 
 ## Development

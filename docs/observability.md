@@ -25,4 +25,6 @@
 ## Compliance
 - Retensi data: PaymentSession + log harus disimpan minimal 1 tahun untuk audit (tentative).
 - Audit trail: sekarang audit log merekam aktivasi premium dan perubahan consent (action `premium_activated`, `consent_updated`). Rencanakan tampilan dashboard audit + retensi 12 bulan.
-- Incident response: definisikan playbook (lihat backlog Langkah 5).
+- Metrics endpoint `/metrics` tersedia untuk Prometheus; histogram `http_server_duration_seconds` mencatat latency per method/route/status (scrape interval 15s disarankan).
+- Backend Sentry (opsional): set `SENTRY_DSN` pada environment API dan tambahkan interceptor Sentry saat siap.
+- Incident response: definisikan playbook (lihat backlog Langkah 5 dan dokumen `docs/incident-response.md`).
