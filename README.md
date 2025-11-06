@@ -19,7 +19,7 @@ Mirror adalah aplikasi teman curhat virtual berbasis AI yang berfokus pada dukun
 - `apps/api` – Kerangka NestJS untuk API utama (auth berbasis kode + profile endpoint in-memory + siap dikembangkan).
 - `services/ai` – FastAPI skeleton untuk orkestrasi AI/LLM.
 - `packages/ui` & `packages/config` – Paket bersama (design system & konfigurasi).
-- `docs/` – Arsitektur, roadmap, backlog, monetisasi (`docs/monetization.md`), branding kit (`docs/branding-kit/`), panduan onboarding premium (`docs/premium-onboarding.md`), install guide lintas platform.
+- `docs/` – Arsitektur, roadmap, backlog, monetisasi (`docs/monetization.md`), branding kit (`docs/branding-kit/`), panduan onboarding premium (`docs/premium-onboarding.md`), observability (`docs/observability.md`), incident response (`docs/incident-response.md`), install guide lintas platform.
 
 ## Perintah Penting
 ```bash

@@ -77,7 +77,7 @@ Backlog berikut mengelompokkan pekerjaan MVP (Fase 1) menjadi _epic_ dan _user s
 - **F1. Logging & Monitoring**
   - Outcome: Sentry integrasi, log struktur (request, response, emosi).
   - Dependensi: Deployment staging.
-  - Selesai bila: Alert real-time untuk error kritis aktif.
+  - Selesai bila: Alert real-time untuk error kritis aktif (`TODO`: connect Sentry server & metric agent).
 - **F2. Data Lifecycle**
   - Outcome: API export data user, hapus akun total, retensi data 12 bulan.
   - Dependensi: Struktur database final.
@@ -85,7 +85,7 @@ Backlog berikut mengelompokkan pekerjaan MVP (Fase 1) menjadi _epic_ dan _user s
 - **F3. Dokumentasi & SOP**
   - Outcome: Panduan incident response, playbook emergency, manual psikolog.
   - Dependensi: Input tim legal & psikologi.
-  - Selesai bila: Dokumen ditandatangani pemangku kepentingan.
+  - Selesai bila: Dokumen ditandatangani pemangku kepentingan (draft awal: `docs/incident-response.md`).
 
 ## Epic G – Monetisasi & Distribusi
 - **G1. Pricing Page & Checkout Mock** ✅ `/subscribe` live + endpoint pembayaran mock untuk uji UX.
