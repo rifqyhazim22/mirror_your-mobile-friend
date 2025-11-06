@@ -8,9 +8,12 @@ import { Observable } from "rxjs";
 import { tap } from "rxjs/operators";
 import { randomUUID } from "crypto";
 import { requestContext } from "./request-context.service";
+import { MetricsService } from "../../metrics/metrics.service";
 
 @Injectable()
 export class StructuredLoggerInterceptor implements NestInterceptor {
+  constructor(private readonly metricsService: MetricsService) {}
+
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest<Request & { user?: { sub: string } }>();
     const start = Date.now();
@@ -37,6 +40,9 @@ export class StructuredLoggerInterceptor implements NestInterceptor {
                 status: (context.switchToHttp().getResponse() as any)?.statusCode ?? 200,
               }),
             );
+            this.metricsService.httpHistogram
+              .labels(method, url, String((context.switchToHttp().getResponse() as any)?.statusCode ?? 200))
+              .observe(duration / 1000);
           },
           error: (error: any) => {
             const duration = Date.now() - start;
@@ -53,6 +59,9 @@ export class StructuredLoggerInterceptor implements NestInterceptor {
                 stack: process.env.NODE_ENV === "production" ? undefined : error?.stack,
               }),
             );
+            this.metricsService.httpHistogram
+              .labels(method, url, String((error?.status ?? 500)))
+              .observe(duration / 1000);
           },
         }),
       ),

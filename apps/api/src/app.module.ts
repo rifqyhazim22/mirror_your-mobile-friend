@@ -8,9 +8,10 @@ import { PrismaModule } from './prisma/prisma.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { StructuredLoggerInterceptor } from './common/logger/structured-logger.interceptor';
 import { HealthModule } from './health/health.module';
+import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, ProfilesModule, PaymentsModule, HealthModule],
+  imports: [PrismaModule, AuthModule, ProfilesModule, PaymentsModule, HealthModule, MetricsModule],
   controllers: [AppController],
   providers: [
     AppService,
