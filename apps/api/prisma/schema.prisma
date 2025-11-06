@@ -28,6 +28,9 @@ model Profile {
   primaryArchetype String?
   zodiacSign    String?
   personalityNotes String?
+  premiumPlanId String?
+  premiumStatus String   @default("free")
+  premiumActiveSince DateTime?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   moodEntries   MoodEntry[]

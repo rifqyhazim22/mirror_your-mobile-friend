@@ -65,4 +65,7 @@ export class CreateProfileDto {
   primaryArchetype?: ArchetypeKey | null;
   zodiacSign?: ZodiacSign | null;
   personalityNotes?: string | null;
+  premiumPlanId?: string | null;
+  premiumStatus?: string | null;
+  premiumActiveSince?: string | null;
 }

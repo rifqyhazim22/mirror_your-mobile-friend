@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import type { CreateSessionDto } from "./dto/create-session.dto";
 import {
@@ -123,10 +123,15 @@ export class PaymentsService {
       }
     }
 
+    const alreadyPaid = session.status === "paid";
     const updated = await this.prisma.paymentSession.update({
       where: { id: sessionId },
       data: { status: "paid" },
     });
+
+    if (!alreadyPaid && updated.status === "paid") {
+      await this.activatePremiumForOwner(session.ownerId, session.planId);
+    }
 
     return {
       id: updated.id,
@@ -167,6 +172,7 @@ export class PaymentsService {
       return { ignored: true };
     }
 
+    const wasPaid = session.status === "paid";
     const updated = await this.prisma.paymentSession.update({
       where: { id: session.id },
       data: {
@@ -178,6 +184,10 @@ export class PaymentsService {
         },
       },
     });
+
+    if (status === "paid" && !wasPaid) {
+      await this.activatePremiumForOwner(session.ownerId, session.planId);
+    }
 
     return {
       id: updated.id,
@@ -204,5 +214,16 @@ export class PaymentsService {
       default:
         return null;
     }
+  }
+
+  private async activatePremiumForOwner(ownerId: string, planId: string) {
+    await this.prisma.profile.updateMany({
+      where: { ownerId },
+      data: {
+        premiumPlanId: planId,
+        premiumStatus: "active",
+        premiumActiveSince: new Date(),
+      },
+    });
   }
 }

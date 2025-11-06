@@ -90,7 +90,7 @@ Backlog berikut mengelompokkan pekerjaan MVP (Fase 1) menjadi _epic_ dan _user s
 ## Epic G – Monetisasi & Distribusi
 - **G1. Pricing Page & Checkout Mock** ✅ `/subscribe` live + endpoint pembayaran mock untuk uji UX.
 - **G2. Payment Gateway Integration** — In-progress: model `PaymentSession` + riwayat transaksi tersimpan; langkah selanjutnya Midtrans/Stripe + webhook paid.
-- **G3. Branding & Marketing Kit** — In-progress: draft `docs/monetization.md` memetakan aset & voice guideline.
+- **G3. Branding & Marketing Kit** — In-progress: draft `docs/monetization.md` + `docs/branding-kit/README.md` mencakup palet, tone, dan TODO aset.
 - **G4. CI Build Pipeline** ✅ GitHub Actions `CI` menjalankan lint/build/test untuk web & API di setiap push/PR.
 
 Backlog akan diperinci dalam papan kanban (_tracking tool_ TBD). Tiap cerita wajib memiliki kriteria uji, rencana keamanan, dan standar aksesibilitas (WCAG 2.2 AA) sebelum dianggap siap rilis.

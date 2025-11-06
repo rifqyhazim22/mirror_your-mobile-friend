@@ -69,6 +69,9 @@ export type MirrorProfile = {
   enneagramType: EnneagramType | null;
   primaryArchetype: ArchetypeKey | null;
   personalityNotes: string;
+  premiumPlanId: string | null;
+  premiumStatus: "free" | "active" | "pending" | "review" | "failed";
+  premiumActiveSince: string | null;
 };
 
 const STORAGE_KEY = "mirror-profile";
@@ -86,6 +89,9 @@ const defaultProfile: MirrorProfile = {
   enneagramType: null,
   primaryArchetype: null,
   personalityNotes: "",
+  premiumPlanId: null,
+  premiumStatus: "free",
+  premiumActiveSince: null,
 };
 
 export function useMirrorProfile(
@@ -161,6 +167,9 @@ export function useMirrorProfile(
           enneagramType: (data.enneagramType ?? null) as MirrorProfile["enneagramType"],
           primaryArchetype: (data.primaryArchetype ?? null) as MirrorProfile["primaryArchetype"],
           personalityNotes: data.personalityNotes ?? "",
+          premiumPlanId: data.premiumPlanId ?? null,
+          premiumStatus: (data.premiumStatus ?? "free") as MirrorProfile["premiumStatus"],
+          premiumActiveSince: data.premiumActiveSince ?? null,
         });
       } catch (error: any) {
         if (controller.signal.aborted) return;
@@ -231,17 +240,27 @@ export function useMirrorProfile(
       const endpoint = profileId
         ? `${apiBase}/profiles/${profileId}`
         : `${apiBase}/profiles`;
+      const payload = {
+        nickname: profile.nickname,
+        focusAreas: profile.focusAreas,
+        consentCamera: profile.consentCamera,
+        consentData: profile.consentData,
+        moodBaseline: profile.moodBaseline,
+        birthDate: profile.birthDate || null,
+        mbtiType: profile.mbtiType,
+        enneagramType: profile.enneagramType,
+        primaryArchetype: profile.primaryArchetype,
+        zodiacSign: profile.zodiacSign,
+        personalityNotes: profile.personalityNotes?.trim() || null,
+      };
+
       const response = await fetch(endpoint, {
         method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${authToken}`,
         },
-        body: JSON.stringify({
-          ...profile,
-          birthDate: profile.birthDate || null,
-          personalityNotes: profile.personalityNotes?.trim() || null,
-        }),
+        body: JSON.stringify(payload),
       });
       if (!response.ok) {
         if (response.status === 401) {
@@ -263,6 +282,9 @@ export function useMirrorProfile(
         enneagramType: (data.enneagramType ?? null) as MirrorProfile["enneagramType"],
         primaryArchetype: (data.primaryArchetype ?? null) as MirrorProfile["primaryArchetype"],
         personalityNotes: data.personalityNotes ?? "",
+        premiumPlanId: data.premiumPlanId ?? null,
+        premiumStatus: (data.premiumStatus ?? "free") as MirrorProfile["premiumStatus"],
+        premiumActiveSince: data.premiumActiveSince ?? null,
       });
       if (!profileId) {
         setProfileId(data.id);

@@ -69,7 +69,7 @@ export default function SubscribePage() {
     login,
     logout,
   } = useMirrorSession();
-  useMirrorProfile(token, logout);
+  const { profile } = useMirrorProfile(token, logout);
   const {
     sessions,
     status: sessionStatus,
@@ -166,6 +166,18 @@ export default function SubscribePage() {
             <p className="max-w-xl text-sm text-white/70 sm:text-base">
               Semua paket dilengkapi privasi end-to-end dan akses ke dukungan manusia saat kamu butuh. Bayar nanti lewat gateway Midtrans setelah credential siap—sementara checkout simulasi membantu uji flow UI.
             </p>
+            {profile.premiumStatus !== "free" && (
+              <p className="rounded-3xl border border-emerald-300/40 bg-emerald-300/10 px-3 py-2 text-xs text-white/80">
+                Status langganan kamu: <strong>{profile.premiumStatus}</strong>{" "}
+                {profile.premiumPlanId ? `(${profile.premiumPlanId})` : ""}{" "}
+                {profile.premiumActiveSince
+                  ? `sejak ${new Intl.DateTimeFormat("id-ID", {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    }).format(new Date(profile.premiumActiveSince))}`
+                  : ""}
+              </p>
+            )}
           </div>
           <div className="rounded-3xl border border-white/15 bg-white/10 p-4 text-sm text-white/75">
             <p className="uppercase tracking-[0.2em] text-white/40">Beta status</p>
@@ -344,6 +356,10 @@ function PaymentHistory({
             <span className="text-xs uppercase tracking-[0.2em] text-white/50">
               {session.status}
             </span>
+          </div>
+          <div className="mt-1 text-[0.65rem] uppercase tracking-[0.2em] text-white/40">
+            Provider: {session.provider ?? "mock"}{" "}
+            {session.providerReference ? `(${session.providerReference})` : ""}
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-white/60">
             <span>
