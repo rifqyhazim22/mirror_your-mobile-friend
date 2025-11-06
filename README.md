@@ -12,7 +12,7 @@ Mirror adalah aplikasi teman curhat virtual berbasis AI yang berfokus pada dukun
 - Mood Insight `/insights` siap memvisualisasikan kalender mood 21 hari, statistik cepat, dan rekomendasi self-care adaptif.
 - Halaman pricing `/subscribe` dengan flow checkout mock + endpoint `POST /v1/payments/checkout-session` untuk simulasi gateway.
 - Konfigurasi Capacitor (Android, iOS, Electron) untuk menghasilkan APK dan aplikasi desktop dari bundle Next.
-- Dokumentasi build lintas platform: `docs/install-android.md`, `docs/install-desktop.md`, `docs/install-pwa.md`.
+- Dokumentasi build lintas platform: `docs/install-android.md`, `docs/install-desktop.md`, `docs/install-ios.md`, `docs/install-pwa.md`.
 
 ## Struktur Direktori
 - `apps/web` – Front-end Next.js (App Router, Tailwind v4, Framer Motion, PWA).
