@@ -43,6 +43,7 @@ pnpm run build:ios          # build web + sync ke proyek iOS
 - `PAYMENTS_PROVIDER` – `mock` (default) atau `midtrans`.
 - `MIDTRANS_SERVER_KEY` & `MIDTRANS_BASE_URL` – diisi ketika integrasi Midtrans aktif (opsional).
 - `PAYMENTS_ADMIN_SECRET` – secret untuk menandai sesi sebagai `paid` ketika memakai provider non-mock.
+- `MIDTRANS_DEFAULT_AMOUNT` – fallback gross amount (untuk testing sandbox) bila plan belum punya harga final.
 - Saat deploy, set variabel yang sama di Vercel / platform yang kamu pakai.
 
 ## Development
@@ -50,6 +51,9 @@ pnpm run build:ios          # build web + sync ke proyek iOS
 pnpm dev:web                     # http://localhost:3000
 API_PORT=3001 pnpm dev:api       # http://localhost:3001 (atau set di .env.local)
 ```
+
+### Continuous Integration
+- Workflow GitHub Actions `CI` menjalankan `pnpm install`, `pnpm --filter api test`, `pnpm --filter api build`, `pnpm --filter web lint`, dan `pnpm --filter web build` setiap push atau pull request ke `main`.
 
 API sementara:
 - `POST /v1/auth/login` – login kode akses beta, menghasilkan JWT sederhana.

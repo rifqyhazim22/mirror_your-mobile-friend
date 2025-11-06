@@ -21,7 +21,9 @@ Dokumen ini memetakan langkah awal menuju monetisasi Mirror sambil menjaga keama
 ## Roadmap Pendek
 - Integrasi Midtrans Snap / Stripe Checkout. Konfigurasi environment:
   - `PAYMENTS_PROVIDER=midtrans`
-  - `MIDTRANS_SERVER_KEY` dan `MIDTRANS_BASE_URL` (sandbox/production).
+  - `MIDTRANS_SERVER_KEY` (server key)
+  - `MIDTRANS_BASE_URL` (contoh sandbox: `https://app.sandbox.midtrans.com`)
+  - `MIDTRANS_DEFAULT_AMOUNT` (opsional fallback nominal untuk plan mock)
 - Implement webhook Midtrans → endpoint `POST /v1/payments/webhook` (TODO) untuk menandai sesi `paid`.
 - Automasi onboarding premium (email + Mirror Connect) ketika status berubah `paid`.
 - Bundle upsell di halaman `/insights` saat data mood menunjukkan kebutuhan ekstra.

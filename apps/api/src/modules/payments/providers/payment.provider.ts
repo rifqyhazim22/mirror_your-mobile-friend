@@ -34,13 +34,53 @@ class MidtransPaymentProvider implements PaymentProvider {
         "Midtrans server key belum diatur. Set MIDTRANS_SERVER_KEY dan MIDTRANS_BASE_URL untuk mengaktifkan provider ini.",
       );
     }
-    // Placeholder: Integrasi Midtrans Snap akan ditambahkan ketika kredensial siap.
-    // Untuk saat ini kita tetap fallback menggunakan URL success agar flow tetap bisa diuji.
+    const snapUrl = `${this.baseUrl ?? "https://app.sandbox.midtrans.com"}/snap/v1/transactions`;
+    const grossAmount =
+      typeof process.env.MIDTRANS_DEFAULT_AMOUNT === "string"
+        ? Number.parseInt(process.env.MIDTRANS_DEFAULT_AMOUNT, 10)
+        : undefined;
+
+    const payload = {
+      transaction_details: {
+        order_id: `mirror-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
+        gross_amount: grossAmount ?? 100000,
+      },
+      callbacks: {
+        finish: dto.successUrl,
+      },
+      metadata: {
+        plan_id: dto.priceId,
+      },
+    };
+
+    const response = await fetch(snapUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Basic ${Buffer.from(`${this.serverKey}:`).toString("base64")}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(
+        `Midtrans Snap request gagal (${response.status}). Detail: ${detail.substring(0, 400)}`,
+      );
+    }
+
+    const data = (await response.json()) as {
+      token: string;
+      redirect_url: string;
+    };
+
     return {
-      checkoutUrl: dto.successUrl,
-      providerReference: "midtrans-pending",
+      checkoutUrl: data.redirect_url ?? dto.successUrl,
+      providerReference: data.token,
       additionalMetadata: {
-        note: "Midtrans integration placeholder - belum membuat transaksi real.",
+        provider_token: data.token,
+        provider_redirect_url: data.redirect_url,
       },
     };
   }
