@@ -13,14 +13,13 @@ Dokumen ini memetakan langkah awal menuju monetisasi Mirror sambil menjaga keama
 
 ## User Flow
 1. Pengguna membuka `/subscribe`, memilih paket, dan submit form.
-2. Next.js route `/api/subscribe/checkout` memanggil endpoint backend `POST /v1/payments/checkout-session`.
-3. Backend sementara membuat session mock, mengembalikan URL redirect. Jika gateway belum siap, route mengalihkan ke `/subscribe/success?mock=1`.
-4. Halaman sukses menampilkan ringkasan paket + instruksi manual untuk timeline human support.
+2. Frontend memanggil endpoint backend `POST /v1/payments/checkout-session` (mock) memakai token Mirror.
+3. Backend menyimpan `PaymentSession` di database (status `ready`) dan mengembalikan `checkoutUrl` simulasi.
+4. Halaman sukses menampilkan ringkasan paket + instruksi manual, sekaligus menampilkan riwayat (via `GET /v1/payments/sessions`).
 
 ## Roadmap Pendek
-- Integrasi Midtrans Snap / Stripe Checkout.
-- Simpan metadata transaksi di tabel `PaymentSession` (Prisma).
-- Automasi email/onboarding premium setelah status `paid`.
+- Integrasi Midtrans Snap / Stripe Checkout (ganti mock session).
+- Tandai status `paid` otomatis dari webhook; trigger onboarding premium (email + Mirror Connect).
 - Bundle upsell di halaman `/insights` saat data mood menunjukkan kebutuhan ekstra.
 
 ## Distribusi Multi-platform

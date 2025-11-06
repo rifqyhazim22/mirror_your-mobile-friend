@@ -56,6 +56,8 @@ API sementara:
 - `POST /v1/profiles/:id/mood-entries` & `GET /v1/profiles/:id/mood-entries` – CRUD mood journal.
 - `GET /v1/payments/plans` – daftar paket langganan (mock).
 - `POST /v1/payments/checkout-session` – buat sesi checkout dummy untuk uji flow.
+- `GET /v1/payments/sessions` – riwayat pembayaran mock (disimpan di Prisma).
+- `POST /v1/payments/sessions/:id/mark-paid` – helper untuk menandai sesi sebagai paid saat testing.
 - Endpoint Next.js `/api/mirror-chat` (AI playground) tetap tanpa auth untuk saat ini.
 
 ### Database & Prisma

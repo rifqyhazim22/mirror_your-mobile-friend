@@ -31,6 +31,7 @@ model Profile {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   moodEntries   MoodEntry[]
+  paymentSessions PaymentSession[]
 
   @@index([ownerId])
 }
@@ -44,5 +45,25 @@ model MoodEntry {
   source    String   @default("manual")
   createdAt DateTime @default(now())
 
+  @@index([profileId])
+}
+
+model PaymentSession {
+  id        String   @id @default(cuid())
+  ownerId   String
+  profileId String?
+  planId    String
+  amount    Int
+  currency  String  @default("IDR")
+  status    String  @default("draft")
+  checkoutUrl String?
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  metadata  Json?
+
+  profile   Profile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
+
+  @@index([ownerId])
   @@index([profileId])
 }

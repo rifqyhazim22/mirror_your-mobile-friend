@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from "@nestjs/common";
 import type { Request } from "express";
 import { AuthGuard } from "../auth/auth.guard";
 import type { AuthPayload } from "../auth/auth.service";
@@ -19,5 +19,17 @@ export class PaymentsController {
   createCheckoutSession(@Req() req: Request, @Body() dto: CreateSessionDto) {
     const owner = (req as Request & { user?: AuthPayload }).user;
     return this.paymentsService.createCheckoutSession(dto, owner!.sub);
+  }
+
+  @Get("sessions")
+  listSessions(@Req() req: Request) {
+    const owner = (req as Request & { user?: AuthPayload }).user;
+    return this.paymentsService.listSessions(owner!.sub);
+  }
+
+  @Post("sessions/:id/mark-paid")
+  markSessionPaid(@Req() req: Request, @Param("id") id: string) {
+    const owner = (req as Request & { user?: AuthPayload }).user;
+    return this.paymentsService.markPaid(id, owner!.sub);
   }
 }

@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
 import type { CreateSessionDto } from "./dto/create-session.dto";
 
 export type PaymentSession = {
@@ -12,15 +13,32 @@ export type PaymentSession = {
 
 @Injectable()
 export class PaymentsService {
+  constructor(private readonly prisma: PrismaService) {}
+
   async createCheckoutSession(dto: CreateSessionDto, ownerId: string): Promise<PaymentSession> {
     const fakeAmount = dto.priceId === "mirror-premium-monthly" ? 499000 : 199000;
+    const created = await this.prisma.paymentSession.create({
+      data: {
+        ownerId,
+        planId: dto.priceId,
+        amount: fakeAmount,
+        status: "ready",
+        checkoutUrl: `${dto.successUrl}?session=mock-${Date.now()}`,
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+        currency: "IDR",
+        metadata: {
+          isMock: true,
+        },
+      },
+    });
+
     return {
-      id: `mock_session_${Date.now()}`,
-      url: `${dto.successUrl}?session=mock-${Date.now()}`,
-      expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
-      amount: fakeAmount,
-      currency: "IDR",
-      status: "ready",
+      id: created.id,
+      url: created.checkoutUrl ?? dto.successUrl,
+      expiresAt: created.expiresAt?.toISOString() ?? "",
+      amount: created.amount,
+      currency: created.currency,
+      status: created.status as "draft" | "ready",
     };
   }
 
@@ -49,5 +67,31 @@ export class PaymentsService {
         ],
       },
     ];
+  }
+
+  async listSessions(ownerId: string) {
+    const sessions = await this.prisma.paymentSession.findMany({
+      where: { ownerId },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+    });
+    return sessions.map((session) => ({
+      id: session.id,
+      planId: session.planId,
+      amount: session.amount,
+      currency: session.currency,
+      status: session.status,
+      checkoutUrl: session.checkoutUrl,
+      expiresAt: session.expiresAt?.toISOString() ?? null,
+      createdAt: session.createdAt.toISOString(),
+      metadata: session.metadata,
+    }));
+  }
+
+  async markPaid(sessionId: string, ownerId: string) {
+    return this.prisma.paymentSession.updateMany({
+      where: { id: sessionId, ownerId },
+      data: { status: "paid" },
+    });
   }
 }

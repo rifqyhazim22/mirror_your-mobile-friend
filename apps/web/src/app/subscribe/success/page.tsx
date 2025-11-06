@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { CheckCircle2, Sparkles, ArrowLeft } from "lucide-react";
+import { CheckCircle2, Sparkles, ArrowLeft, Loader2 } from "lucide-react";
+import { useMirrorSession } from "@/hooks/useMirrorSession";
+import { usePaymentSessions } from "@/hooks/usePaymentSessions";
 
 const planCopy: Record<string, { title: string; message: string }> = {
   "mirror-premium-monthly": {
@@ -18,10 +20,17 @@ const planCopy: Record<string, { title: string; message: string }> = {
 };
 
 export default function SubscribeSuccessPage() {
-  const searchParams = useSearchParams();
-  const planId = searchParams.get("plan") ?? "mirror-premium-monthly";
-  const mock = searchParams.get("mock") === "1";
+  const [planId, setPlanId] = useState("mirror-premium-monthly");
+  const [mock, setMock] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    setPlanId(params.get("plan") ?? "mirror-premium-monthly");
+    setMock(params.get("mock") === "1");
+  }, []);
   const plan = planCopy[planId] ?? planCopy["mirror-premium-monthly"];
+  const { token, logout } = useMirrorSession();
+  const { sessions, status } = usePaymentSessions(token, logout);
 
   return (
     <div className="relative min-h-screen bg-night pb-20 text-white">
@@ -51,6 +60,28 @@ export default function SubscribeSuccessPage() {
             Butuh bantuan cepat? Hubungi support@mirror.dev atau pakai tombol “hubungkan manusia” di sandbox chat.
           </p>
         </div>
+        <section className="rounded-3xl border border-white/15 bg-white/8 p-6 text-left text-sm text-white/80">
+          <p className="uppercase tracking-[0.2em] text-white/40">Riwayat transaksi terbaru</p>
+          {status === "loading" ? (
+            <p className="mt-3 flex items-center gap-2 text-white/70">
+              <Loader2 className="h-4 w-4 animate-spin" /> Memuat transaksi...
+            </p>
+          ) : (
+            <ul className="mt-3 space-y-2 text-white/70">
+              {sessions.slice(0, 3).map((session) => (
+                <li key={session.id} className="flex items-center justify-between rounded-2xl border border-white/15 bg-white/6 px-3 py-2 text-xs">
+                  <span>{session.planId}</span>
+                  <span className="uppercase tracking-[0.2em] text-white/50">{session.status}</span>
+                </li>
+              ))}
+              {sessions.length === 0 && (
+                <li className="text-xs text-white/55">
+                  Riwayat belum tersedia. Jika ini simulasi, refresh halaman atau coba cek dashboard pembayaran nanti.
+                </li>
+              )}
+            </ul>
+          )}
+        </section>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
             href="/experience"
