@@ -110,21 +110,29 @@ export function EmotionWatcher({
         </button>
       </div>
       <div className="relative flex h-32 w-full items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-black/40">
-        {status === "active" && (
-          <video ref={videoRef} muted playsInline className="h-full w-full object-cover" />
-        )}
+        <video
+          ref={videoRef}
+          muted
+          playsInline
+          autoPlay
+          className={`h-full w-full object-cover transition-opacity duration-300 ${
+            status === "active" ? "opacity-100" : "opacity-0"
+          }`}
+        />
         {status === "loading" && (
-          <div className="flex items-center gap-2 text-xs text-white/70">
+          <div className="absolute inset-0 flex items-center justify-center gap-2 text-xs text-white/70">
             <Loader2 className="h-4 w-4 animate-spin" /> Menyiapkan kamera...
           </div>
         )}
         {status === "error" && (
-          <div className="flex items-center gap-2 text-xs text-rose-200">
+          <div className="absolute inset-0 flex items-center justify-center gap-2 text-xs text-rose-200">
             <VideoOff className="h-4 w-4" /> {errorMessage}
           </div>
         )}
         {status === "idle" && (
-          <div className="text-xs text-white/60">Kamera nonaktif</div>
+          <div className="absolute inset-0 flex items-center justify-center text-xs text-white/60">
+            Kamera nonaktif
+          </div>
         )}
       </div>
       <p className="text-xs text-white/60">
