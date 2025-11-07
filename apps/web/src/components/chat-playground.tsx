@@ -291,7 +291,7 @@ export function ChatPlayground({
         </button>
       </header>
 
-      <div className="glass-panel grid h-[600px] grid-rows-[auto_auto_1fr_auto] gap-4 p-6 sm:p-8">
+      <div className="glass-panel flex min-h-[720px] flex-col gap-4 p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
@@ -341,7 +341,7 @@ export function ChatPlayground({
           consentGiven={profile.consentCamera}
         />
 
-        <div className="scroll-smooth space-y-4 overflow-y-auto pr-2">
+        <div className="scroll-smooth space-y-4 overflow-y-auto pr-2 flex-1">
           {messages.map((message) => (
             <motion.div
               key={message.id}

@@ -109,7 +109,10 @@ export function EmotionWatcher({
           {enabled ? "Matikan" : "Aktifkan"}
         </button>
       </div>
-      <div className="relative flex h-32 w-full items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+      <div
+        className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-black/40"
+        style={{ aspectRatio: "16 / 9" }}
+      >
         <video
           ref={videoRef}
           muted
