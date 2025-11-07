@@ -1,4 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import type { Prisma } from "@prisma/client";
 import { PrismaService } from "../../prisma/prisma.service";
 import type { CreateSessionDto } from "./dto/create-session.dto";
 import {
@@ -178,7 +179,7 @@ export class PaymentsService {
       data: {
         status,
         metadata: {
-          ...(session.metadata ?? {}),
+          ...this.toMetadataRecord(session.metadata),
           lastMidtransStatus: payload.transaction_status,
           lastMidtransFraudStatus: payload.fraud_status,
         },
@@ -214,6 +215,13 @@ export class PaymentsService {
       default:
         return null;
     }
+  }
+
+  private toMetadataRecord(metadata: Prisma.JsonValue | null | undefined) {
+    if (metadata && typeof metadata === "object" && !Array.isArray(metadata)) {
+      return metadata as Record<string, unknown>;
+    }
+    return {};
   }
 
   private async activatePremiumForOwner(
