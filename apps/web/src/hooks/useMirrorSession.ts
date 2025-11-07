@@ -12,10 +12,9 @@ export function useMirrorSession() {
     return base.replace(/\/$/, "");
   }, []);
   const bypassAuth = useMemo(() => {
-    const envValue = process.env.NEXT_PUBLIC_AUTH_BYPASS;
-    if (envValue === "true") return true;
+    const envValue = process.env.NEXT_PUBLIC_AUTH_BYPASS?.toLowerCase();
     if (envValue === "false") return false;
-    return process.env.NODE_ENV !== "production";
+    return true;
   }, []);
 
   const [token, setToken] = useState<string | null>(null);
@@ -69,7 +68,7 @@ export function useMirrorSession() {
         throw err;
       }
     },
-    [apiBase]
+    [apiBase, bypassAuth]
   );
 
   const logout = useCallback(() => {

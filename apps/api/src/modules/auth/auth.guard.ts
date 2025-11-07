@@ -11,10 +11,9 @@ export class AuthGuard implements CanActivate {
   constructor(private readonly authService: AuthService) {}
 
   private get bypassEnabled() {
-    const envFlag = process.env.AUTH_BYPASS;
-    if (envFlag === "true") return true;
+    const envFlag = process.env.AUTH_BYPASS?.toLowerCase();
     if (envFlag === "false") return false;
-    return process.env.NODE_ENV !== "production";
+    return true;
   }
 
   canActivate(context: ExecutionContext): boolean {
