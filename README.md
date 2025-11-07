@@ -36,7 +36,7 @@ pnpm run build:ios          # build web + sync ke proyek iOS
 ## Environment Variables
 - Duplikasi `.env.example` menjadi `.env.local` lalu isi:
   - `OPENAI_API_KEY` – OpenAI project key.
-  - `API_PORT` (opsional) – port untuk NestJS lokal.
+- `API_PORT` (opsional) – port untuk NestJS lokal (default 3001 supaya tidak bentrok dengan Next.js).
 - `NEXT_PUBLIC_MIRROR_API_URL` – base URL API (contoh: `http://localhost:3001/v1`).
 - `AUTH_SHARED_SECRET` – kode akses beta (diserahkan ke pengguna).
 - `AUTH_JWT_SECRET` – secret key untuk menandatangani JWT sederhana.
