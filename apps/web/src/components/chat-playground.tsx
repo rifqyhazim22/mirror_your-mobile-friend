@@ -253,7 +253,7 @@ export function ChatPlayground({
             Kita curhat santai aja ya, {assistantName}! 💜
           </h1>
           <p className="text-sm text-white/80 sm:text-base">
-            Ini versi demo Mirror. Pesanmu dikirim ke model gpt-4.1 mini dari OpenAI, jadi kamu sudah bisa merasakan empatinya.
+            Ini versi demo Mirror. Pesanmu dikirim ke model gpt-5.0 nano dari OpenAI, jadi kamu sudah bisa merasakan empatinya.
           </p>
           {(profile.mbtiType ||
             profile.enneagramType ||

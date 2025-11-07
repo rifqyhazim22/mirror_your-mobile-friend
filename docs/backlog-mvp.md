@@ -35,7 +35,7 @@ Backlog berikut mengelompokkan pekerjaan MVP (Fase 1) menjadi _epic_ dan _user s
   - Outcome: Tampilan chat mirip messenger, status mengetik, avatar AI adaptif.
   - Dependensi: Design system, store state.
   - Selesai bila: Percakapan dummy flow berfungsi offline (mock).
-- **C2. Orkestrasi LLM** ✅ Next.js API → OpenAI `gpt-4.1-mini` (Responses API) + persona prompting.
+- **C2. Orkestrasi LLM** ✅ Next.js API → OpenAI `gpt-5.0-nano` (Responses API) + persona prompting.
   - Outcome: Gateway API -> service AI -> LLM -> response guard -> persist log.
   - Dependensi: Secret LLM, guardrails policy.
   - Selesai bila: >50 skenario test lintas emosi lolos, output tersimpan.

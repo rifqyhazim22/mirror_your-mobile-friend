@@ -7,7 +7,7 @@ Mirror adalah aplikasi teman curhat virtual berbasis AI yang berfokus pada dukun
 - Landing page Next.js bernuansa liquid-glass + emotikon empatik, siap sebagai PWA (next-pwa).
 - Halaman pengalaman `/experience` menghadirkan onboarding empatik multi-langkah + simulasi chat Mirror.
 - Onboarding kini mencatat vibe kepribadian (MBTI, Enneagram, archetype, mood baseline, zodiak) untuk mempersonalisasi percakapan dan prompt AI.
-- Chat playground sudah terhubung ke LLM OpenAI (`gpt-4.1-mini`). Radar emosi sementara berupa preview kamera manual (deteksi otomatis akan hadir kemudian).
+- Chat playground sudah terhubung ke LLM OpenAI (`gpt-5.0-nano`). Radar emosi sementara berupa preview kamera manual (deteksi otomatis akan hadir kemudian).
 - Mini mood journal tersinkron ke backend (manual & auto capture kamera) untuk mencatat suasana hati setelah sesi chat.
 - Mood Insight `/insights` siap memvisualisasikan kalender mood 21 hari, statistik cepat, dan rekomendasi self-care adaptif.
 - Halaman pricing `/subscribe` dengan flow checkout mock + endpoint `POST /v1/payments/checkout-session` untuk simulasi gateway.
@@ -36,7 +36,7 @@ pnpm run build:ios          # build web + sync ke proyek iOS
 ## Environment Variables
 - Duplikasi `.env.example` menjadi `.env.local` lalu isi:
 - `OPENAI_API_KEY` – OpenAI project key.
-- `OPENAI_RESPONDER_MODEL` – opsional, override model chat (default `gpt-4.1-mini`).
+- `OPENAI_RESPONDER_MODEL` – opsional, override model chat (default `gpt-5.0-nano`).
 - `API_PORT` (opsional) – port untuk NestJS lokal (default 3001 supaya tidak bentrok dengan Next.js).
 - `NEXT_PUBLIC_MIRROR_API_URL` – base URL API (contoh: `http://localhost:3001/v1`).
 - `AUTH_SHARED_SECRET` – kode akses beta (diserahkan ke pengguna).

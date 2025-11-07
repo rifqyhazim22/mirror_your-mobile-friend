@@ -44,7 +44,7 @@ Dokumen ini merumuskan arsitektur awal untuk merealisasikan visi pada _Konsep Ap
   - S3-compatible: bukti identitas psikolog, catatan audio (jika diizinkan), export data user.
   - LangChain Vector Store (PostgreSQL pgvector atau Pinecone) untuk retrieval konten psikologi & journaling.
 - **Integrasi Eksternal**
-  - LLM provider (Azure OpenAI GPT-4o) + fallback open-source (LLaMA 3) via Ollama + guardrails. Prototipe terbaru memakai langsung OpenAI Responses API (`gpt-4.1-mini`).
+  - LLM provider (Azure OpenAI GPT-4o) + fallback open-source (LLaMA 3) via Ollama + guardrails. Prototipe terbaru memakai langsung OpenAI Responses API (`gpt-5.0-nano`).
   - Payment gateway (Midtrans/Xendit) untuk sesi psikolog berbayar.
   - Notifikasi: Firebase Cloud Messaging untuk push, Resend/Sendgrid untuk email.
   - Kalender psikolog: integrasi Cal.com / Google Calendar API untuk sinkronisasi jadwal.
