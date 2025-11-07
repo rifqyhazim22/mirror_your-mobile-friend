@@ -18,10 +18,6 @@ const withPWA = createNextPWA({
 });
 
 const baseConfig: ExtendedNextConfig = {
-  output: "export",
-  images: {
-    unoptimized: true
-  },
   experimental: {
     manualClientBasePath: true
   },
