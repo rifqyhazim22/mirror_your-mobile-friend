@@ -35,6 +35,7 @@ model Profile {
   updatedAt     DateTime    @updatedAt
   moodEntries   MoodEntry[]
   paymentSessions PaymentSession[]
+  auditLogs     AuditLog[]
 
   @@index([ownerId])
 }
@@ -78,6 +79,7 @@ model AuditLog {
   id        String   @id @default(cuid())
   ownerId   String
   profileId String?
+  paymentSessionId String?
   actorId   String?
   action    String
   entityType String
@@ -86,6 +88,7 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   profile   Profile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
+  paymentSession PaymentSession? @relation(fields: [paymentSessionId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
   @@index([profileId])
