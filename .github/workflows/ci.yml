@@ -22,7 +22,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 10.20.0
           run_install: false
       - name: Add pnpm to PATH
         run: echo "$PNPM_HOME" >> $GITHUB_PATH
