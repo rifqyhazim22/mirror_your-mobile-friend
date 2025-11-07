@@ -48,7 +48,7 @@ export async function POST(request: Request) {
   let payload: ChatPayload;
   try {
     payload = (await request.json()) as ChatPayload;
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Payload tidak valid" },
       { status: 400 }
@@ -112,13 +112,17 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ message: text, meta: { action: "allow" } });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Mirror chat error", error);
-    const status = error?.status ?? 500;
+    const status =
+      typeof error === "object" && error && "status" in error
+        ? Number((error as { status?: number }).status) || 500
+        : 500;
+    const detail = error instanceof Error ? error.message : "";
     return NextResponse.json(
       {
         error: "Mirror lagi kepayahan menjawab. Coba lagi sebentar, ya.",
-        detail: error?.message ?? "",
+        detail,
       },
       { status }
     );
@@ -179,7 +183,7 @@ async function runModeration(content: string) {
       input: content,
     });
     return response.results?.some((result) => result.flagged) ?? false;
-  } catch (error) {
+  } catch (error: unknown) {
     console.warn("Moderation check gagal", error);
     return false;
   }

@@ -275,7 +275,7 @@ export default function InsightsPage() {
             </div>
           ) : (
             <p className="mt-3 text-sm text-white/60">
-              Belum ada catatan mood. Mulai dari tombol "Simpan mood" di sandbox chat Mirror.
+              Belum ada catatan mood. Mulai dari tombol “Simpan mood” di sandbox chat Mirror.
             </p>
           )}
         </section>

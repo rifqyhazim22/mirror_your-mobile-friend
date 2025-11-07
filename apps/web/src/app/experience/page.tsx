@@ -189,9 +189,13 @@ export default function ExperiencePage() {
         await persistProfile();
         setAutoEntered(true);
         setMode("chat");
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error(error);
-        setSubmitError(error?.message || "Gagal menyimpan profil. Coba lagi ya 💛");
+        const fallbackMessage =
+          error instanceof Error && error.message
+            ? error.message
+            : "Gagal menyimpan profil. Coba lagi ya 💛";
+        setSubmitError(fallbackMessage);
       }
     }
   };
@@ -245,8 +249,12 @@ export default function ExperiencePage() {
                   setLoginCode("");
                   setLoginMessage("Berhasil masuk, selamat datang! 💜");
                   setTimeout(() => setLoginMessage(null), 2500);
-                } catch (error: any) {
-                  setLoginMessage(error?.message || "Kode akses salah");
+                } catch (error: unknown) {
+                  const message =
+                    error instanceof Error && error.message
+                      ? error.message
+                      : "Kode akses salah";
+                  setLoginMessage(message);
                 }
               }}
               disabled={!loginCode.trim() || authStatus === "loading"}
