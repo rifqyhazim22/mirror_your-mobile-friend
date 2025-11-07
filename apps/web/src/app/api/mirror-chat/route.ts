@@ -9,7 +9,7 @@ import { logGuardrailEvent } from "@/lib/guardrail-logger";
 const openaiKey = process.env.OPENAI_API_KEY;
 const openai = openaiKey ? new OpenAI({ apiKey: openaiKey }) : null;
 
-const modelName = "gpt-5.0-nano";
+const modelName = process.env.OPENAI_RESPONDER_MODEL || "gpt-4.1-mini";
 
 type MirrorProfilePayload = {
   nickname?: string;
