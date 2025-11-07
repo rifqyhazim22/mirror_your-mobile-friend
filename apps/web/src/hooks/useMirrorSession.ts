@@ -11,7 +11,12 @@ export function useMirrorSession() {
     const base = process.env.NEXT_PUBLIC_MIRROR_API_URL || "http://localhost:3001/v1";
     return base.replace(/\/$/, "");
   }, []);
-  const bypassAuth = process.env.NEXT_PUBLIC_AUTH_BYPASS === "true";
+  const bypassAuth = useMemo(() => {
+    const envValue = process.env.NEXT_PUBLIC_AUTH_BYPASS;
+    if (envValue === "true") return true;
+    if (envValue === "false") return false;
+    return process.env.NODE_ENV !== "production";
+  }, []);
 
   const [token, setToken] = useState<string | null>(null);
   const [status, setStatus] = useState<AuthStatus>("idle");

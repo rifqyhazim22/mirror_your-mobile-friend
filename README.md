@@ -48,8 +48,8 @@ pnpm run build:ios          # build web + sync ke proyek iOS
 - `NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE`, `NEXT_PUBLIC_SENTRY_REPLAY_SAMPLE_RATE`, `NEXT_PUBLIC_SENTRY_REPLAY_ERROR_SAMPLE_RATE` – konfigurasi sampling Sentry (default 0.1 / 0 / 0).
 - `SENTRY_DSN` – DSN backend opsional untuk menangkap error/trace dari API.
 - `SENTRY_TRACES_SAMPLE_RATE` – sampling rate trace backend (default 0.1).
-- `AUTH_BYPASS` – set `true` untuk menonaktifkan autentikasi beta di API (hanya untuk development).
-- `NEXT_PUBLIC_AUTH_BYPASS` – set `true` agar frontend melewati form kode akses (dipakai bersama `AUTH_BYPASS`).
+- `AUTH_BYPASS` – `true` untuk mematikan gate beta di API; default otomatis `true` pada `NODE_ENV !== "production"` kecuali di-set `false`.
+- `NEXT_PUBLIC_AUTH_BYPASS` – `true` untuk melewati form kode akses di frontend; default mengikuti mode non-produksi kecuali di-set eksplisit.
 - Saat deploy, set variabel yang sama di Vercel / platform yang kamu pakai.
 
 ## Development

@@ -10,9 +10,16 @@ import { AuthService } from "./auth.service";
 export class AuthGuard implements CanActivate {
   constructor(private readonly authService: AuthService) {}
 
+  private get bypassEnabled() {
+    const envFlag = process.env.AUTH_BYPASS;
+    if (envFlag === "true") return true;
+    if (envFlag === "false") return false;
+    return process.env.NODE_ENV !== "production";
+  }
+
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    if (process.env.AUTH_BYPASS === "true") {
+    if (this.bypassEnabled) {
       request.user = { sub: "dev-bypass-user" };
       return true;
     }
